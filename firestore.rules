@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Classement : tout joueur connecté lit les fiches, chacun n'écrit que la sienne.
+    match /players/{uid} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.nick is string && request.resource.data.nick.size() <= 24
+        && request.resource.data.xp is number && request.resource.data.done is map
+        && request.resource.data.sr is map && request.resource.data.hist is map;
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

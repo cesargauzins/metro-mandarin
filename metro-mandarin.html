@@ -555,7 +555,7 @@ function flush(){
   const body=JSON.parse(JSON.stringify(P));
   saveChain=saveChain.then(()=>db.doc("players/"+uid).set(body)).catch(e=>{
     const code=e&&e.code;
-    if(code==="invalid_argument"||code==="not_granted"||code==="revoked"){ canWrite=false; if(!warnedWrite){warnedWrite=true; toast("Ta progression est gardée sur cet appareil, mais ne peut pas être partagée : demande à la personne qui t'a envoyé le lien de t'inviter avec l'accès Éditeur.");} renderTop(); }
+    if(code==="invalid_argument"||code==="not_granted"||code==="revoked"||code==="permission-denied"||code==="unauthenticated"){ canWrite=false; if(!warnedWrite){warnedWrite=true; toast(fb?"La sauvegarde en ligne a été refusée. Ta progression reste sur cet appareil : déconnecte-toi puis reconnecte-toi depuis ton profil.":"Ta progression est gardée sur cet appareil, mais ne peut pas être partagée : demande à la personne qui t'a envoyé le lien de t'inviter avec l'accès Éditeur.");} renderTop(); }
     else if(code==="unavailable"){ setTimeout(flush,1500+Math.random()*1500); }
     else toast("Sauvegarde en ligne impossible pour l'instant. Ta progression reste sur cet appareil.");
   });
@@ -626,7 +626,7 @@ function miniLeague(){
   const box=h("section",{class:"panel"},h("h3",null,"Classement de la semaine"));
   const b=h("div",{class:"board"});
   list.forEach((p,i)=>b.append(boardRow(p,i,weekXp(p.d)+" XP",null)));
-  if(list.length<2) b.append(h("div",{class:"empty"},mode==="local"?"Le classement apparaît quand la page est ouverte depuis son lien partagé.":"Tes amis apparaîtront ici dès qu'ils auront choisi leur pseudo."));
+  if(list.length<2) b.append(h("div",{class:"empty"},mode==="local"?(fb?"Connecte-toi avec Google depuis ton profil pour voir tes amis.":"Le classement apparaît quand la page est ouverte depuis son lien partagé."):"Tes amis apparaîtront ici dès qu'ils auront choisi leur pseudo."));
   box.append(b, h("button",{class:"btn ghost small",style:"margin-top:12px",onclick:()=>go("league")},"Voir tout"));
   return box;
 }
@@ -727,7 +727,7 @@ function viewLeague(){
     });
   }
   if(!list.length) b.append(h("div",{class:"empty"},"Choisis ton pseudo pour apparaître dans le classement."));
-  else if(list.length<2) b.append(h("div",{class:"empty"},mode==="local"?"Hors ligne : seul ton profil est visible sur cet appareil.":"Personne d'autre pour l'instant. Dès que tes amis ouvriront la page et choisiront un pseudo, ils apparaîtront ici avec leur progression."));
+  else if(list.length<2) b.append(h("div",{class:"empty"},mode==="local"?(fb?"Sans compte, seul ton profil est visible. Connecte-toi avec Google depuis ton profil pour voir tes amis.":"Hors ligne : seul ton profil est visible sur cet appareil."):"Personne d'autre pour l'instant. Dès que tes amis ouvriront la page et choisiront un pseudo, ils apparaîtront ici avec leur progression."));
   panel.append(b); wrap.append(panel);
   return wrap;
 }
@@ -782,7 +782,8 @@ function showBig(it){
 function viewMe(){
   const wrap=h("div");
   if(!P){ wrap.append(h("div",{class:"empty"},"Crée ton profil pour commencer."),h("button",{class:"btn",onclick:openOnboarding},"Créer mon profil")); return wrap; }
-  wrap.append(h("div",{class:"me-head"},seal(P.animal,64),h("div",null,h("h1",null,P.nick),h("span",{class:"muted"},"À bord depuis le "+fmtDate(P.start)+" · "+(mode==="db"&&canWrite?"progression partagée":"progression sur cet appareil")))));
+  wrap.append(h("div",{class:"me-head"},seal(P.animal,64),h("div",null,h("h1",null,P.nick),h("span",{class:"muted"},"À bord depuis le "+fmtDate(P.start)+" · "+(mode==="db"&&canWrite?"progression partagée":"progression sur cet appareil")),
+    fb?h("div",{style:"margin-top:8px"},fbUser?h("button",{class:"btn ghost small",onclick:fbSignOut},"Se déconnecter"):h("button",{class:"btn small",onclick:fbSignIn},"Se connecter avec Google")):null)));
   wrap.append(h("div",{class:"stats"},
     h("div",{class:"stat"},h("b",null,P.xp),h("span",null,"XP au total")),
     h("div",{class:"stat"},h("b",null,curStreak(P)),h("span",null,"jours de série")),
@@ -835,7 +836,7 @@ let onboardingOpen=false;
 async function openOnboarding(){
   if(onboardingOpen) return; onboardingOpen=true;
   let name="";
-  try{ if(userCap){ const me=await userCap.me(); name=(me.name||"").split(" ")[0]; } }catch(e){}
+  try{ if(fbUser) name=(fbUser.displayName||"").split(" ")[0]; else if(userCap){ const me=await userCap.me(); name=(me.name||"").split(" ")[0]; } }catch(e){}
   let animal=Math.floor(Math.random()*12), goal=20;
   const nick=h("input",{id:"ob-nick",maxlength:"24",value:name,placeholder:"Ex. Léa"});
   const dep=h("input",{id:"ob-dep",type:"date",value:"2027-02-15"});
@@ -1062,18 +1063,51 @@ document.addEventListener("keydown",e=>{
   }
 });
 
+/* ================== FIREBASE (version GitHub Pages) ================== */
+let fb=null, fbUser=null;
+function fbInit(){
+  if(fb) return fb;
+  if(!(window.MM_FIREBASE&&window.firebase)) return null;
+  try{ firebase.initializeApp(window.MM_FIREBASE); fb={auth:firebase.auth(),fs:firebase.firestore()}; }catch(e){ fb=null; }
+  return fb;
+}
+async function fbSignIn(){
+  const p=new firebase.auth.GoogleAuthProvider();
+  try{ await fb.auth.signInWithPopup(p); try{localStorage.removeItem("mm-no-account")}catch(e){} location.reload(); }
+  catch(e){
+    const c=e&&e.code;
+    if(c==="auth/popup-blocked"||c==="auth/operation-not-supported-in-this-environment"){ try{ await fb.auth.signInWithRedirect(p); }catch(e2){ toast("Connexion impossible. Réessaie dans un instant."); } }
+    else if(c!=="auth/popup-closed-by-user"&&c!=="auth/cancelled-popup-request") toast("Connexion impossible. Réessaie dans un instant.");
+  }
+}
+function fbSignOut(){ fb.auth.signOut().then(()=>location.reload()); }
+function openSignIn(){
+  openModal(h("div",{class:"sheet",role:"dialog","aria-modal":"true","aria-labelledby":"si-title"},
+    h("div",null,h("div",{class:"kicker",style:"color:var(--brand-text)"},"上车 · shàng chē · montez à bord"),h("h2",{id:"si-title",style:"margin-top:6px"},"Bienvenue dans le métro")),
+    h("p",{class:"muted",style:"margin:-8px 0 0"},"12 lignes, 60 stations : les phrases utiles pour l'hôtel, le restaurant, le taxi et la vie étudiante. Connecte-toi pour retrouver ta progression sur tous tes appareils et voir où en sont tes amis."),
+    h("button",{class:"btn wide",onclick:fbSignIn},"Se connecter avec Google"),
+    h("button",{class:"btn ghost wide",onclick:()=>{lsSet("mm-no-account",1);closeModal();mode="local";P=lsGet("mm-player-local");if(P)P=clean(P);renderAll();if(!P)openOnboarding();}},"Jouer sans compte"),
+    h("p",{class:"muted",style:"margin:0;font-size:13px"},"Sans compte, ta progression reste dans ce navigateur et tu n'apparais pas dans le classement.")));
+}
+
 /* ================== DÉMARRAGE ================== */
 (function(){ const v=(location.hash||"").slice(1); if(VIEWS[v]) view=v; })();
 P=lsGet("mm-player-"+(lsGet("mm-last-uid")||"local")); if(P) P=clean(P);
 renderAll();
 (async()=>{
   let d=null,u=null;
-  try{ if(window.claude&&typeof window.claude.use==="function"){ [d,u]=await Promise.all([window.claude.use("db"),window.claude.use("user")]); } }catch(e){}
-  userCap=u;
-  try{ if(u) uid=await u.id(); }catch(e){ uid=null; }
+  if(fbInit()){
+    // Version GitHub Pages : Firebase (connexion Google + Firestore)
+    try{ fbUser=await new Promise(r=>{const un=fb.auth.onAuthStateChanged(x=>{un();r(x)})}); }catch(e){ fbUser=null; }
+    if(fbUser){ d=fb.fs; uid=fbUser.uid; }
+  } else {
+    try{ if(window.claude&&typeof window.claude.use==="function"){ [d,u]=await Promise.all([window.claude.use("db"),window.claude.use("user")]); } }catch(e){}
+    userCap=u;
+    try{ if(u) uid=await u.id(); }catch(e){ uid=null; }
+  }
   if(d&&uid){
     mode="db"; db=d; lsSet("mm-last-uid",uid);
-    try{ const w=await u.can("data.write"); if(w===false){ canWrite=false; warnedWrite=true; toast("Tu peux t'entraîner, mais ta progression reste sur cet appareil : demande à la personne qui t'a envoyé le lien de t'inviter avec l'accès Éditeur."); } }catch(e){}
+    try{ if(u){ const w=await u.can("data.write"); if(w===false){ canWrite=false; warnedWrite=true; toast("Tu peux t'entraîner, mais ta progression reste sur cet appareil : demande à la personne qui t'a envoyé le lien de t'inviter avec l'accès Éditeur."); } } }catch(e){}
     let remote=null; try{ const snap=await db.doc("players/"+uid).get(); if(snap.exists) remote=clean(snap.data()); }catch(e){}
     const localRaw=lsGet("mm-player-"+uid);
     const local=localRaw?clean(localRaw):null;
@@ -1084,10 +1118,13 @@ renderAll();
       const o={}; snap.docs.forEach(doc=>{ if(doc.id!==uid&&doc.exists) o[doc.id]=clean(doc.data()); }); others=o;
       if(!L){ if(view!=="me"&&view!=="lex") renderMain(); renderRail(); }
     },err=>{});
+  } else if(fb&&!lsGet("mm-no-account")){
+    mode="signin"; P=null;
   } else {
     mode="local"; P=lsGet("mm-player-local"); if(P) P=clean(P);
   }
-  if(!P) openOnboarding();
+  if(mode==="signin") openSignIn();
+  else if(!P) openOnboarding();
   if(view!=="me") renderAll(); else {renderTop();renderRail();}
 })();
 </script>

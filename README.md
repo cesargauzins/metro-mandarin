@@ -8,9 +8,10 @@ Le chinois de survie pour partir en Chine, façon Duolingo. Le parcours est un p
 - XP, série de jours, objectif quotidien, rythme calculé pour être prêt avant la date de départ.
 - Lexique avec recherche et mode « Montrer en grand » pour montrer une phrase à quelqu'un.
 
-Sur GitHub Pages, la progression est enregistrée dans le navigateur (localStorage). Le classement partagé entre amis fonctionne dans la version publiée sur claude.ai.
+Connexion avec Google : la progression et le classement entre amis sont stockés dans Firebase (Firestore, règles dans `firestore.rules` : chacun lit les fiches et n'écrit que la sienne). On peut aussi jouer sans compte, la progression reste alors dans le navigateur.
 
 ## Fichiers
 
 - `metro-mandarin.html` : la source (contenu de la page).
-- `index.html` : page autonome générée par `sh build.sh`.
+- `index.html` : page autonome générée par `sh build.sh` (ajoute Firebase).
+- `firestore.rules` : règles de sécurité, déployées avec `firebase deploy --only firestore:rules`.
