@@ -303,6 +303,41 @@ main{min-width:0;padding-block:18px 110px}
 .shake{animation:shake .32s}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
+.match{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mcol{display:grid;gap:10px;align-content:start;min-width:0}
+.mbtn{display:grid;gap:2px;justify-items:start;text-align:left;padding:12px;border-radius:14px;border:2px solid var(--ctl);background:var(--surface);box-shadow:0 3px 0 var(--ctl);min-height:62px;min-width:0}
+.mbtn b{font:700 19px/1.25 var(--zh)}
+.mbtn span{font-size:13px;color:var(--sel);font-weight:700}
+.mbtn .frt{font-size:15px;color:var(--ink)}
+.mbtn[aria-pressed="true"]{border-color:var(--sel);background:var(--sel-bg);box-shadow:0 3px 0 var(--sel)}
+.mbtn.done{border-color:var(--ok);background:var(--ok-bg);box-shadow:none;pointer-events:none}
+.mbtn.done b,.mbtn.done span{color:var(--ok-ink)}
+.mbtn.miss{border-color:var(--bad);background:var(--bad-bg);box-shadow:0 3px 0 var(--bad);animation:shake .32s}
+.fc-count{display:flex;gap:6px}
+.fc-count b{min-width:34px;text-align:center;padding:5px 8px;border-radius:999px;font:800 14px/1 var(--body);font-variant-numeric:tabular-nums}
+.fc-count .bad-t{background:var(--bad-bg);color:var(--bad-ink)}
+.fc-count .ok-t{background:var(--ok-bg);color:var(--ok-ink)}
+.fc-stage{display:grid;place-items:center;padding-block:8px}
+.fc-card{position:relative;width:min(100%,400px);height:min(52vh,460px);min-height:280px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;transition:transform .26s ease;perspective:1200px}
+.fc-card:focus-visible{outline:3px solid var(--sel);outline-offset:4px;border-radius:24px}
+.fc-inner{position:absolute;inset:0;transition:transform .45s ease;transform-style:preserve-3d}
+.fc-inner.flipped{transform:rotateY(180deg)}
+.fc-side{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.fc-side.back{transform:rotateY(180deg)}
+.fc-face{height:100%;display:grid;align-content:center;justify-items:center;gap:12px;padding:24px;text-align:center;border-radius:24px;border:2px solid var(--rule);background:var(--sunk);box-shadow:0 6px 0 var(--rule)}
+.fc-card[data-dir="yes"] .fc-face{border-color:var(--ok)}
+.fc-card[data-dir="no"] .fc-face{border-color:var(--bad)}
+.fc-fr{font:800 clamp(24px,6vw,34px)/1.2 var(--display);text-wrap:balance}
+.fc-zh{font:700 clamp(40px,11vw,60px)/1.2 var(--zh)}
+.fc-py{font-size:20px;font-weight:800;color:var(--sel)}
+.fc-stamp{position:absolute;top:18px;z-index:2;padding:6px 10px;border-radius:10px;border:3px solid;font:800 15px/1 var(--body);letter-spacing:.06em;text-transform:uppercase;background:var(--surface);visibility:hidden}
+.fc-stamp.yes{left:18px;color:var(--ok);transform:rotate(-10deg)}
+.fc-stamp.no{right:18px;color:var(--bad);transform:rotate(10deg)}
+.fc-card[data-dir="yes"] .fc-stamp.yes,.fc-card[data-dir="no"] .fc-stamp.no{visibility:visible}
+.fc-hint{text-align:center;font-size:13px;margin:0}
+.l-foot .btn .ico{width:20px;height:20px}
+.l-body{overflow-x:hidden}
+
 /* ---------- modal / toast ---------- */
 .modal{position:fixed;inset:0;z-index:80;background:var(--scrim);display:grid;place-items:end center;
   padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px))}
@@ -525,16 +560,17 @@ let mode="boot";     // boot | db | local
 let uid=null, db=null, userCap=null, canWrite=true;
 let view="path", leagueTab="week", scrolledToCurrent=false;
 
-function newPlayer(o){return {v:1,nick:o.nick,animal:o.animal,dep:o.dep,goal:o.goal,start:dayKey(),xp:0,wk:weekKey(),wkXp:0,streak:0,best:0,last:"",hist:{},done:{},sr:{},upd:Date.now()}}
+function newPlayer(o){return {v:1,nick:o.nick,animal:o.animal,dep:o.dep,goal:o.goal,start:dayKey(),xp:0,wk:weekKey(),wkXp:0,streak:0,best:0,last:"",hist:{},done:{},sr:{},fc:[],upd:Date.now()}}
 function clean(d){
   d=d&&typeof d==="object"?d:{};
   const num=v=>Number.isFinite(+v)?+v:0, str=(v,n)=>typeof v==="string"?v.slice(0,n):"";
   const done={}; if(d.done&&typeof d.done==="object") for(const n of NODES) if(num(d.done[n.id])>0) done[n.id]=num(d.done[n.id]);
   const hist={}; if(d.hist&&typeof d.hist==="object") for(const k in d.hist) if(/^\d{4}-\d\d-\d\d$/.test(k)) hist[k]=num(d.hist[k]);
   const sr={}; if(d.sr&&typeof d.sr==="object") for(const k in d.sr) if(ITEM_BY_KEY[k]&&Array.isArray(d.sr[k])) sr[k]=[num(d.sr[k][0]),num(d.sr[k][1])];
+  const fc=Array.isArray(d.fc)?[...new Set(d.fc.filter(k=>typeof k==="string"&&ITEM_BY_KEY[k]))].slice(0,300):[];
   return {v:1,nick:str(d.nick,24).trim()||"Voyageur",animal:Math.max(0,Math.min(11,num(d.animal)|0)),dep:/^\d{4}-\d\d-\d\d$/.test(d.dep)?d.dep:"2027-02-15",
     goal:[10,20,30,50].includes(num(d.goal))?num(d.goal):20,start:/^\d{4}-\d\d-\d\d$/.test(d.start)?d.start:dayKey(),xp:num(d.xp),wk:str(d.wk,10),wkXp:num(d.wkXp),
-    streak:num(d.streak),best:num(d.best),last:str(d.last,10),hist,done,sr,upd:num(d.upd)};
+    streak:num(d.streak),best:num(d.best),last:str(d.last,10),hist,done,sr,fc,upd:num(d.upd)};
 }
 const frontier=p=>{if(!p) return 0; const i=NODES.findIndex(n=>!p.done[n.id]); return i<0?NODES.length:i};
 const doneCount=p=>p?NODES.filter(n=>p.done[n.id]).length:0;
@@ -736,7 +772,9 @@ function viewLeague(){
 let lexQuery="";
 function viewLex(){
   const wrap=h("div");
-  wrap.append(h("div",{class:"view-head"},h("div",null,h("div",{class:"kicker"},"Tes phrases"),h("h1",null,"Lexique"))));
+  const nLearn=learnedItems(P).length, nPend=P?(P.fc||[]).length:0;
+  wrap.append(h("div",{class:"view-head"},h("div",null,h("div",{class:"kicker"},"Tes phrases"),h("h1",null,"Lexique")),
+    h("button",{class:"btn",disabled:!nLearn,onclick:openCardsMenu},"Cartes de révision"+(nPend?` · ${nPend} à revoir`:""))));
   const tones=h("section",{class:"panel",style:"margin-bottom:18px"},h("h3",null,"Les quatre tons"),
     h("p",{class:"muted",style:"margin:-6px 0 12px;font-size:14px"},"Même syllabe, quatre sens. Touche pour écouter."));
   const tg=h("div",{class:"tones"});
@@ -812,10 +850,20 @@ function viewMe(){
   rate.addEventListener("change",()=>{prefs.rate=+rate.value;savePrefs();say("你好，很高兴认识你")});
   form.append(h("label",{class:"check"},sf,"Sons de réussite et d'erreur"));
   form.append(h("div",{class:"field"},h("label",{for:"set-rate"},"Vitesse de la voix"),rate));
-  form.append(h("p",{class:"muted",style:"margin:0;font-size:13px"},audioOK?"Voix chinoise trouvée sur cet appareil.":"Aucune voix chinoise trouvée sur cet appareil : les exercices d'écoute sont remplacés. Sur Android ou iPhone, ajoute la voix « Chinois (Mandarin) » dans les réglages de synthèse vocale."));
+  form.append(h("p",{class:"muted",style:"margin:0;font-size:13px"},audioOK?"Voix chinoise trouvée sur cet appareil.":"Aucune voix chinoise trouvée sur cet appareil : tu ne pourras pas écouter les phrases. Sur Android ou iPhone, ajoute la voix « Chinois (Mandarin) » dans les réglages de synthèse vocale."));
   cols.append(h("section",{class:"panel"},h("h3",null,"Réglages"),form));
+  cols.append(h("section",{class:"panel"},h("h3",null,"Recommencer à zéro"),
+    h("p",{class:"muted",style:"margin:-4px 0 12px;font-size:14px"},"Efface tes stations, ton XP, ta série et tes cartes pour tout réapprendre depuis la ligne 1. Ton pseudo et ton animal sont gardés."),
+    h("button",{class:"btn bad",onclick:askReset},"Réinitialiser ma progression")));
   wrap.append(cols);
   return wrap;
+}
+function askReset(){
+  const n=doneCount(P);
+  openModal(h("div",{class:"sheet"},h("h2",null,"Tout réinitialiser ?"),
+    h("p",{class:"muted",style:"margin:0"},`Tu vas perdre ${n} station${n>1?"s":""} validée${n>1?"s":""} et ${P.xp} XP. Impossible de revenir en arrière.`),
+    h("div",{class:"row-btns"},h("button",{class:"btn ghost",onclick:closeModal},"Annuler"),
+      h("button",{class:"btn bad",onclick:()=>{P=newPlayer({nick:P.nick,animal:P.animal,dep:P.dep,goal:P.goal}); save(); closeModal(); scrolledToCurrent=false; go("path"); toast("Progression réinitialisée. Retour à 莘庄, ligne 1.");}},"Réinitialiser"))));
 }
 function zodiacPicker(cur,onPick){
   const g=h("div",{class:"zodiac",role:"group"});
@@ -867,7 +915,7 @@ function distractors(it,n,exclude=[]){
 }
 function makeStep(t,it,extra){
   const s={t,it,...extra};
-  if(t==="zf"||t==="fz"||t==="listen") s.opts=shuffle([it,...distractors(it,3)]);
+  if(t==="zf"||t==="fz") s.opts=shuffle([it,...distractors(it,3)]);
   if(t==="build"){
     const used=new Set(it.tok.map(x=>x.replace(PUNCT,"")));
     const extras=[]; for(const x of shuffle(ITEMS.filter(x=>x.u===it.u&&x.key!==it.key))){ x.tok.forEach((tk,i)=>{const c=tk.replace(PUNCT,""); if(c&&!used.has(c)&&extras.length<(it.tok.length>4?3:2)){used.add(c);extras.push({z:c,p:x.pyt[i].replace(PUNCT,"").trim()})}}); if(extras.length>=3) break; }
@@ -878,33 +926,42 @@ function makeStep(t,it,extra){
 }
 const lessonOf=it=>ITEMS.filter(x=>x.u===it.u&&x.l===it.l);
 function randType(it,avoid){
-  const ts=["zf","fz"]; if(audioOK) ts.push("listen","listen"); if(it.tok.length>=2) ts.push("build","build","build");
+  const ts=["zf","zf","fz","fz"]; if(it.tok.length>=2) ts.push("build");
   const f=ts.filter(t=>t!==avoid); return f[Math.floor(Math.random()*f.length)];
 }
 function weakest(pool,n){
   const today=dayNum(dayKey());
   return [...pool].map(it=>{const s=P.sr[it.key]||[0,0]; return {it,w:s[0]*2-(today-s[1])*0.15+Math.random()*1.5}}).sort((a,b)=>a.w-b.w).slice(0,n).map(x=>x.it);
 }
+const matchStep=items=>({t:"match",items:shuffle(items).slice(0,5)});
+function withMatch(steps,items,at){ if(items.length>=3) steps.splice(Math.min(at,steps.length),0,matchStep(items)); return steps; }
 function buildSteps(node){
   const steps=[];
   if(!node){ // révision rapide
-    weakest(learnedItems(P),10).forEach(it=>steps.push(makeStep(randType(it),it)));
-    return steps;
+    const w=weakest(learnedItems(P),10);
+    w.forEach(it=>steps.push(makeStep(randType(it),it)));
+    return withMatch(steps,w.slice(0,5),4);
   }
   if(node.term){
-    weakest(ITEMS.filter(x=>x.u===node.u),12).forEach(it=>steps.push(makeStep(randType(it),it)));
-    return shuffle(steps);
+    const pool=ITEMS.filter(x=>x.u===node.u), w=weakest(pool,12);
+    w.forEach(it=>steps.push(makeStep(randType(it),it)));
+    return withMatch(shuffle(steps),shuffle(pool).slice(0,5),5);
   }
   const its=ITEMS.filter(x=>x.u===node.u&&x.l===node.l), ls=LINES[node.u].L[node.l], first=!P.done[node.id];
   const mixed=[];
   if(first){
+    // découverte : chaque phrase est présentée puis traduite du chinois vers le français
     its.forEach(it=>{steps.push(makeStep("intro",it)); steps.push(makeStep("zf",it));});
-    its.forEach(it=>mixed.push(makeStep(it.tok.length>=2?"build":(audioOK?"listen":"fz"),it)));
+    steps.push(matchStep(its));
+    its.forEach(it=>mixed.push(makeStep("fz",it)));
+    shuffle(its.filter(it=>it.tok.length>=2)).slice(0,2).forEach(it=>mixed.push(makeStep("build",it)));
   } else {
-    its.forEach(it=>{const a=randType(it); mixed.push(makeStep(a,it)); mixed.push(makeStep(randType(it,a),it));});
+    its.forEach(it=>{mixed.push(makeStep("zf",it)); mixed.push(makeStep("fz",it));});
+    const b=shuffle(its.filter(it=>it.tok.length>=2))[0]; if(b) mixed.push(makeStep("build",b));
   }
   (ls.c||[]).forEach(c=>mixed.push(makeStep("ctx",its[c.a],{c})));
-  return steps.concat(shuffle(mixed));
+  const out=steps.concat(shuffle(mixed));
+  return first?out:withMatch(out,its,4);
 }
 
 let L=null; // leçon en cours
@@ -944,6 +1001,7 @@ function renderStep(){
   const it=s.it, body=[];
   const checkBtn=h("button",{class:"btn",disabled:true,onclick:()=>check()},"Vérifier");
   L.checkBtn=checkBtn;
+  if(s.t==="match"){ renderMatch(s); return; }
   if(s.t==="intro"){
     body.push(h("div",{class:"q-kicker",style:`color:${lessonColor()}`},"Nouvelle phrase"));
     body.push(h("div",{class:"card-new pop"},zhEl("div",it.zh,"zh"),h("div",{class:"py"},it.py),h("div",{class:"fr"},it.fr),it.note?h("div",{class:"note"},it.note):null,h("div",{class:"audio-row"},audioBtns(it.zh))));
@@ -963,10 +1021,6 @@ function renderStep(){
     body.push(h("div",{class:"q-title"},"Comment dit-on ?"));
     body.push(h("div",{class:"prompt"},h("div",{class:"fr"},"« "+it.fr+" »")));
     addOpts(s.opts,(o,i)=>optCard(o,"zh",i),s.opts.every(o=>o.zh.length<=4)); body.push(optsBox);
-  } else if(s.t==="listen"){
-    body.push(h("div",{class:"q-title"},"Qu'est-ce que tu entends ?"));
-    body.push(h("div",{class:"audio-row"},audioBtns(it.zh,true)));
-    addOpts(s.opts,(o,i)=>optCard(o,"listen",i),s.opts.every(o=>o.zh.length<=4)); body.push(optsBox); setTimeout(()=>say(it.zh),250);
   } else if(s.t==="ctx"){
     const c=s.c;
     body.push(h("div",{class:"q-kicker",style:`color:${lessonColor()}`},"Situation"));
@@ -988,6 +1042,41 @@ function renderStep(){
   }
   L.optsBox=optsBox;
   lessonFrame(body,footer("",null,checkBtn));
+}
+function renderMatch(s){
+  const n=s.items.length, left=shuffle(s.items), right=shuffle(s.items);
+  let sel={fr:null,zh:null}, found=0, errs=0; const wrong=new Set();
+  L.checkBtn={disabled:true};
+  const colL=h("div",{class:"mcol"}), colR=h("div",{class:"mcol"});
+  const tap=(b,it,side)=>{
+    if(L.answered||b.classList.contains("done")) return;
+    if(side==="zh") say(it.zh);
+    const col=side==="fr"?colL:colR, again=sel[side]&&sel[side].b===b;
+    col.querySelectorAll(".mbtn").forEach(x=>x.setAttribute("aria-pressed",String(x===b&&!again)));
+    sel[side]=again?null:{b,it};
+    if(!sel.fr||!sel.zh) return;
+    const A=sel.fr, B=sel.zh; sel={fr:null,zh:null};
+    if(A.it.key===B.it.key){
+      [A.b,B.b].forEach(x=>{x.classList.add("done");x.setAttribute("aria-pressed","false")}); found++; sfx("ok");
+      if(found===n) matchDone(s,errs,wrong);
+    } else {
+      errs++; wrong.add(A.it.key); wrong.add(B.it.key); sfx("bad");
+      [A.b,B.b].forEach(x=>{x.setAttribute("aria-pressed","false");x.classList.add("miss");setTimeout(()=>x.classList.remove("miss"),550)});
+    }
+  };
+  left.forEach(it=>{const b=h("button",{class:"mbtn"},h("span",{class:"frt"},it.fr)); b.onclick=()=>tap(b,it,"fr"); colL.append(b);});
+  right.forEach(it=>{const b=h("button",{class:"mbtn"},zhEl("b",it.zh),h("span",null,it.py)); b.onclick=()=>tap(b,it,"zh"); colR.append(b);});
+  lessonFrame([h("div",{class:"q-title"},"Relie chaque phrase à sa traduction"),h("div",{class:"match"},colL,colR)],
+    footer("",h("span",{class:"muted"},"Touche une phrase en français, puis sa traduction en chinois."),h("span")));
+}
+function matchDone(s,errs,wrong){
+  L.answered=true; L.graded++; if(!errs) L.firstOk++; else L.mist++;
+  const today=dayNum(dayKey());
+  s.items.forEach(it=>{const cur=P.sr[it.key]||[0,0]; P.sr[it.key]=[wrong.has(it.key)?Math.max(0,cur[0]-1):Math.min(5,cur[0]+1),today];});
+  const content=h("div",{class:"fb"},h("span",{class:"fb-ico"},icon("check")),
+    h("div",{style:"min-width:0"},h("h3",null,errs?"Toutes les paires trouvées":"Sans faute !"),h("p",null,errs?`${errs} erreur${errs>1?"s":""} en route. Ces phrases reviendront plus souvent.`:"Tu connais ces traductions.")));
+  const btn=h("button",{class:"btn ok",onclick:next},"Continuer");
+  const el=$("#lesson"); el.replaceChild(footer("ok",content,btn),el.lastChild); btn.focus({preventScroll:true});
 }
 function check(){
   if(L.answered) return;
@@ -1018,12 +1107,7 @@ function next(){ L.i++; if(L.i>=L.steps.length) finish(); else renderStep(); }
 function finish(){
   const node=L.node, perfect=L.mist===0;
   const base=!node?8:node.term?15:10, xp=base+(perfect?5:0);
-  const today=dayKey(), tn=dayNum(today);
-  if(P.last!==today){ P.streak=(dayNum(P.last)===tn-1)?P.streak+1:1; P.last=today; }
-  P.best=Math.max(P.best,P.streak);
-  P.xp+=xp; P.hist[today]=(P.hist[today]||0)+xp;
-  for(const k in P.hist) if(dayNum(k)<tn-200) delete P.hist[k];
-  if(P.wk!==weekKey()){P.wk=weekKey();P.wkXp=0;} P.wkXp+=xp;
+  awardXp(xp);
   if(node) P.done[node.id]=(P.done[node.id]||0)+1;
   save();
   const acc=L.graded?Math.round(L.firstOk/L.graded*100):100, secs=Math.round((Date.now()-L.t0)/1000);
@@ -1041,6 +1125,14 @@ function finish(){
   L.i=L.steps.length;
   lessonFrame([body],footer("",null,h("button",{class:"btn",onclick:closeLesson},"Continuer")));
 }
+function awardXp(xp){
+  const today=dayKey(), tn=dayNum(today);
+  if(P.last!==today){ P.streak=(dayNum(P.last)===tn-1)?P.streak+1:1; P.last=today; }
+  P.best=Math.max(P.best,P.streak);
+  P.xp+=xp; P.hist[today]=(P.hist[today]||0)+xp;
+  for(const k in P.hist) if(dayNum(k)<tn-200) delete P.hist[k];
+  if(P.wk!==weekKey()){P.wk=weekKey();P.wkXp=0;} P.wkXp+=xp;
+}
 function confetti(){
   if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const c=$("#confetti"); c.hidden=false; const ctx=c.getContext("2d"); const W=c.width=innerWidth, H=c.height=innerHeight;
@@ -1049,12 +1141,109 @@ function confetti(){
   let f=0; (function tick(){ ctx.clearRect(0,0,W,H); ps.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.a+=.15; ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;ctx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);ctx.restore();});
     if(++f<110) requestAnimationFrame(tick); else {ctx.clearRect(0,0,W,H); c.hidden=true;} })();
 }
+/* ================== CARTES DE RÉVISION ================== */
+let FC=null;
+function openCardsMenu(){
+  const all=learnedItems(P); if(!all.length) return;
+  const pending=(P.fc||[]).filter(k=>all.some(it=>it.key===k));
+  let front=prefs.fcFront==="zh"?"zh":"fr";
+  const seg=h("div",{class:"seg",role:"group","aria-label":"Face visible"});
+  [["fr","Français d'abord"],["zh","Chinois d'abord"]].forEach(([v,l])=>{const b=h("button",{"aria-pressed":v===front},l); b.onclick=()=>{front=v;prefs.fcFront=v;savePrefs();seg.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));}; seg.append(b);});
+  const go=keys=>{closeModal(); startCards(keys,front);};
+  openModal(h("div",{class:"sheet"},
+    h("div",null,h("div",{class:"kicker"},"Lexique"),h("h2",{style:"margin-top:6px"},"Cartes de révision")),
+    h("p",{class:"muted",style:"margin:-8px 0 0"},"Touche la carte pour la retourner. Glisse à droite si tu savais, à gauche sinon : le paquet suivant reprend les cartes ratées."),
+    h("div",{class:"field"},h("span",{class:"lab"},"Face visible"),seg),
+    pending.length?h("button",{class:"btn wide",onclick:()=>go(pending)},`Reprendre : ${pending.length} carte${pending.length>1?"s":""} à revoir`):null,
+    h("button",{class:"btn wide"+(pending.length?" ghost":""),onclick:()=>{P.fc=[];save();go(all.map(it=>it.key));}},pending.length?`Réinitialiser : toutes les cartes (${all.length})`:`Commencer : ${all.length} cartes`),
+    h("button",{class:"btn ghost wide",onclick:closeModal},"Fermer")));
+}
+function startCards(keys,front){
+  FC={deck:shuffle(keys),i:0,right:[],wrong:[],front,flipped:false};
+  $("#lesson").hidden=false; document.body.style.overflow="hidden";
+  renderCard();
+}
+function closeCards(){
+  if(FC&&FC.i<FC.deck.length){ P.fc=[...new Set(FC.wrong.concat(FC.deck.slice(FC.i)))]; save(); }
+  FC=null; $("#lesson").hidden=true; $("#lesson").replaceChildren(); document.body.style.overflow=""; try{speechSynthesis.cancel()}catch(e){} renderAll();
+}
+function cardFrame(body,foot){
+  const el=$("#lesson"); el.replaceChildren();
+  const pct=FC.i/FC.deck.length*100;
+  el.append(
+    h("div",{class:"l-top l-wrap"},h("button",{class:"l-close","aria-label":"Fermer les cartes",onclick:closeCards},icon("close")),
+      h("div",{class:"prog"},h("i",{style:`width:${pct}%;background:var(--sel)`})),
+      h("span",{class:"fc-count"},h("b",{class:"bad-t",title:"À revoir"},FC.wrong.length),h("b",{class:"ok-t",title:"Je savais"},FC.right.length))),
+    h("div",{class:"l-body"},h("div",{class:"l-wrap"},body)),foot);
+}
+function renderCard(){
+  if(FC.i>=FC.deck.length) return cardsDone();
+  const it=ITEM_BY_KEY[FC.deck[FC.i]]; FC.flipped=false;
+  const face=(side)=>side==="fr"
+    ?h("div",{class:"fc-face"},h("div",{class:"kicker"},"Français"),h("div",{class:"fc-fr"},it.fr))
+    :h("div",{class:"fc-face"},h("div",{class:"kicker"},"Chinois"),zhEl("div",it.zh,"fc-zh"),h("div",{class:"fc-py"},it.py),h("div",{class:"audio-row",onpointerdown:e=>e.stopPropagation()},audioBtns(it.zh)));
+  const back=FC.front==="fr"?"zh":"fr";
+  const inner=h("div",{class:"fc-inner"},h("div",{class:"fc-side front"},face(FC.front)),h("div",{class:"fc-side back"},face(back)));
+  const card=h("div",{class:"fc-card",role:"button",tabindex:"0","aria-label":"Carte : touche pour retourner"},
+    h("span",{class:"fc-stamp yes"},"Je savais"),h("span",{class:"fc-stamp no"},"À revoir"),inner);
+  const flip=()=>{FC.flipped=!FC.flipped; inner.classList.toggle("flipped",FC.flipped); if((FC.flipped?back:FC.front)==="zh") say(it.zh);};
+  FC.flip=flip; FC.card=card;
+  let x0=0,y0=0,dx=0,drag=false;
+  card.addEventListener("pointerdown",e=>{drag=true;x0=e.clientX;y0=e.clientY;dx=0;try{card.setPointerCapture(e.pointerId)}catch(_){}card.style.transition="none";});
+  card.addEventListener("pointermove",e=>{ if(!drag) return; dx=e.clientX-x0; card.style.transform=`translateX(${dx}px) rotate(${dx/18}deg)`; card.dataset.dir=dx>40?"yes":dx<-40?"no":""; });
+  const end=e=>{ if(!drag) return; drag=false; card.style.transition="";
+    if(Math.abs(dx)>90) return swipe(dx>0);
+    card.style.transform=""; card.dataset.dir="";
+    if(Math.abs(dx)<8&&Math.abs(e.clientY-y0)<8) flip(); };
+  card.addEventListener("pointerup",end); card.addEventListener("pointercancel",()=>{drag=false;card.style.transition="";card.style.transform="";card.dataset.dir="";});
+  card.addEventListener("keydown",e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();flip();}});
+  if(FC.front==="zh") say(it.zh);
+  cardFrame([h("div",{class:"fc-stage"},card),h("p",{class:"muted fc-hint"},"Touche pour retourner · glisse à droite si tu savais, à gauche sinon")],
+    footer("",h("button",{class:"btn bad",onclick:()=>swipe(false)},icon("cross"),"À revoir"),h("button",{class:"btn ok",onclick:()=>swipe(true)},icon("check"),"Je savais")));
+}
+function swipe(ok){
+  if(!FC||FC.busy||FC.i>=FC.deck.length) return; FC.busy=true;
+  const key=FC.deck[FC.i], card=FC.card;
+  (ok?FC.right:FC.wrong).push(key);
+  const cur=P.sr[key]||[0,0]; P.sr[key]=[ok?Math.min(5,cur[0]+1):Math.max(0,cur[0]-2),dayNum(dayKey())];
+  sfx(ok?"ok":"bad");
+  card.dataset.dir=ok?"yes":"no"; card.style.transform=`translateX(${ok?140:-140}vw) rotate(${ok?25:-25}deg)`;
+  setTimeout(()=>{ if(!FC) return; FC.busy=false; FC.i++; renderCard(); },matchMedia("(prefers-reduced-motion: reduce)").matches?0:260);
+}
+function cardsDone(){
+  const r=FC.right.length, w=FC.wrong.length, total=r+w;
+  P.fc=[...FC.wrong];
+  const xp=Math.min(15,Math.max(2,Math.round(total/3)));
+  awardXp(xp); save();
+  sfx("win"); if(!w) confetti();
+  const restart=keys=>{const f=FC.front; startCards(keys,f);};
+  cardFrame([h("div",{class:"done-screen"},
+      h("div",{class:"q-kicker",style:"color:var(--sel)"},"Paquet terminé"),
+      zhEl("div",w?"加油":"太棒了","big-st"),
+      h("div",{class:"muted",style:"font-weight:700"},w?"jiāyóu · courage !":"tài bàng le · génial !"),
+      h("div",{class:"done-stats"},
+        h("div",null,h("b",{style:"color:var(--ok)"},r),h("span",null,"Je savais")),
+        h("div",null,h("b",{style:"color:var(--bad)"},w),h("span",null,"À revoir")),
+        h("div",null,h("b",{style:"color:var(--gold)"},"+"+xp),h("span",null,"XP"))),
+      w?h("button",{class:"btn wide",style:"max-width:440px",onclick:()=>restart(FC.wrong)},`Revoir les ${w} carte${w>1?"s":""} ratée${w>1?"s":""}`):null,
+      h("button",{class:"btn ghost wide",style:"max-width:440px",onclick:()=>{P.fc=[];save();restart(learnedItems(P).map(it=>it.key));}},"Recommencer avec toutes les cartes"))],
+    footer("",null,h("button",{class:"btn",onclick:()=>{FC.i=FC.deck.length;closeCards();}},"Terminer")));
+}
+
 document.addEventListener("keydown",e=>{
+  if(FC&&$("#modal").hidden){
+    if(e.key==="Escape") closeCards();
+    else if(FC.i<FC.deck.length){
+      if(e.key==="ArrowRight") swipe(true); else if(e.key==="ArrowLeft") swipe(false);
+      else if((e.key===" "||e.key==="ArrowUp"||e.key==="ArrowDown")&&document.activeElement===document.body){e.preventDefault();FC.flip();}
+    }
+    return;
+  }
   if(!L||!$("#modal").hidden) { if(e.key==="Escape"&&!$("#modal").hidden) closeModal(); return; }
   if(e.key==="Escape"){askQuit();return;}
   const s=L.steps[L.i];
   if(!s) return;
-  if(/^[1-4]$/.test(e.key)&&!L.answered&&L.pick&&s.t!=="build"&&s.t!=="intro"){L.pick(+e.key-1);return;}
+  if(/^[1-4]$/.test(e.key)&&!L.answered&&L.pick&&s.t!=="build"&&s.t!=="intro"&&s.t!=="match"){L.pick(+e.key-1);return;}
   if(e.key==="Enter"){
     const ae=document.activeElement;
     if(ae&&ae.closest&&(ae.closest(".l-foot")||ae.closest(".l-top")||ae.classList.contains("iconbtn")||ae.classList.contains("tile"))) return;
