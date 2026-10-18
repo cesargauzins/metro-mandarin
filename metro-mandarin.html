@@ -388,6 +388,12 @@ main{min-width:0;padding-block:18px 110px}
 .gsub{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-top:3px}
 .gsub .badge{width:20px;height:20px;font-size:12px;border-radius:6px}
 .gsheet{max-width:620px}
+.gchips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
+.card-new .gchips,.fc-face .gchips{justify-content:center}
+.gchips-l{font:800 11px/1 var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.gchip{border:1.5px solid var(--sel);background:var(--surface);color:var(--sel-ink);border-radius:999px;padding:5px 10px;font:700 12px/1.2 var(--body)}
+.gchip:hover{background:var(--sel-bg)}
+.ok .gchips-l{color:var(--ok-ink)} .bad .gchips-l{color:var(--bad-ink)}
 @media (max-width:420px){.tab{font-size:10.5px}}
 
 /* ---------- modal / toast ---------- */
@@ -620,6 +626,15 @@ const GRAMMAR=[
  {id:"guo",at:"10-3",t:"过 : avoir déjà fait",f:[["s","你","Qui"],["v","去","Verbe"],["n","过","déjà"],["o","法国","Où"],["q","吗","?"]],
   x:["过 guo juste après un verbe veut dire « l'avoir déjà fait au moins une fois » : 你去过法国吗？ = tu es déjà allé(e) en France ?","Réponse : 去过 (oui) ou 没去过 (non, jamais)."],
   e:[["你|去|过|法国|吗？","nǐ|qù|guo|Fǎguó|ma?","Tu es déjà allé(e) en France ?"],["我|没|去|过|北京","wǒ|méi|qù|guo|Běijīng","Je ne suis jamais allé(e) à Pékin"]]},
+ {id:"qing",at:"0-1",t:"请 : demander poliment",f:[["n","请","s'il vous plaît"],["v","再说","Action"],["o","一遍","encore une fois"]],
+  x:["请 qǐng en début de phrase rend une demande polie : 请 + l'action demandée. 请再说一遍 = « s'il vous plaît, redites une fois ». À l'hôtel ou au restaurant, c'est la façon la plus simple d'être poli.","请 veut aussi dire « inviter » : 我请你 = je t'invite, c'est moi qui paie."],
+  e:[["请|再|说|一遍","qǐng|zài|shuō|yí biàn","Vous pouvez répéter ?"],["请|给|我|菜单","qǐng|gěi|wǒ|càidān","Le menu, s'il vous plaît"],["请|写|下来","qǐng|xiě|xiàlái","Vous pouvez l'écrire ?"]]},
+ {id:"serie",at:"1-3",t:"Plusieurs verbes à la suite",f:[["s","我","Qui"],["v","喜欢","Verbe 1"],["v","看","Verbe 2"],["o","电影","Quoi"]],
+  x:["On enchaîne les verbes directement, sans « de » ni « pour » : 我喜欢看电影 = « moi aimer regarder film ». 一起去吃饭 = « ensemble aller manger ».","Les actions se suivent dans l'ordre logique : 请帮我打电话 = « s'il vous plaît aider moi passer un appel »."],
+  e:[["我|喜欢|看|电影","wǒ|xǐhuan|kàn|diànyǐng","J'aime regarder des films"],["一起|去|吃饭|吧","yìqǐ|qù|chīfàn|ba","Allons manger ensemble"],["请|帮|我|打|电话","qǐng|bāng|wǒ|dǎ|diànhuà","Vous pouvez téléphoner pour moi ?"]]},
+ {id:"gei",at:"4-0",t:"给 : à quelqu'un",f:[["s","我","Qui"],["v","发","Action"],["n","给","à"],["o","你","Qui reçoit"]],
+  x:["给 gěi veut dire « donner ». Placé après un verbe, il indique à qui va l'action : 我发给你 = je l'envoie à toi.","En début de demande, 给我… = donnez-moi… Très utile pour commander : 请给我菜单, le menu s'il vous plaît."],
+  e:[["请|给|我|菜单","qǐng|gěi|wǒ|càidān","Le menu, s'il vous plaît"],["我|发|给|你","wǒ|fā|gěi|nǐ","Je te l'envoie"],["请|给|我|一个|勺子","qǐng|gěi|wǒ|yí ge|sháozi","Une cuillère, s'il vous plaît"]]},
  {id:"heure",at:"11-1",t:"L'heure : 点 et 半",f:[["n","八","Nombre"],["v","点","heure"],["o","半","et demie"]],
   x:["Pour dire l'heure : nombre + 点. 三点 = 3 h, 八点半 = 8 h 30.","Le matin (早上) ou le soir (晚上) se place avant : 晚上七点 = 19 h. Pour demander : 几点？"],
   e:[["现在|几点？","xiànzài|jǐ diǎn?","Quelle heure est-il ?"],["八|点|半","bā|diǎn|bàn","Huit heures et demie"],["晚上|七|点","wǎnshang|qī|diǎn","19 h"]]}
@@ -640,7 +655,42 @@ LINES.forEach((ln,u)=>{
 });
 const ITEM_BY_KEY=Object.fromEntries(ITEMS.map(x=>[x.key,x]));
 function toItem(r){const tok=r[0].split("|"),pyt=r[1].split("|"),zh=tok.join("");return {key:zh.replace(PUNCT,""),tok,pyt,zh,py:cap(pyt.join(" ").replace(/\s+([?!])/g," $1")),fr:r[2]};}
-GRAMMAR.forEach(g=>{g.ex=g.e.map(toItem); const [u,l]=g.at.split("-").map(Number); g.u=u; g.l=l;});
+const words=it=>it.tok.map(t=>t.replace(PUNCT,""));
+const has=(t,...w)=>w.some(x=>t.includes(x));
+const isNum=x=>/^[一二三四五六七八九十两]+$/.test(x||"");
+// Quelles phrases utilisent chaque structure (sert à expliquer au moment où on la rencontre)
+const SERIE_V=new Set(["喜欢","看","去","吃饭","吃","来","帮","打","会","说","想","叫","学","用","借","坐","试","等","写","发","喝","买","找不到","听不懂"]);
+const GMATCH={
+  mots:t=>t.join("")==="你好",
+  bu:t=>has(t,"不","不是","不要"),
+  ma:t=>has(t,"吗"),
+  zai:t=>{const i=t.indexOf("在");return i>=0&&t[i+1]==="哪儿"},
+  shi:t=>has(t,"是"),
+  hen:t=>has(t,"很"),
+  svo:t=>t[0]==="我"&&t.length>=3&&!has(t,"在","了","吗","的"),
+  lieu:t=>{const i=t.indexOf("在");return i>=0&&!!t[i+1]&&t[i+1]!=="哪儿"&&i+2<t.length},
+  wh:t=>has(t,"什么","哪儿","多少","几","几点","怎么","多久","多大","哪国人","怎么样"),
+  ne:t=>has(t,"呢","也"),
+  de:t=>has(t,"的"),
+  cl:t=>has(t,"杯","瓶","碗","位","个","一份","一张","一辆","一个","两个","四个","一斤"),
+  le:t=>has(t,"了"),
+  ba:t=>has(t,"吧","一点"),
+  yao:t=>has(t,"要","想","不要"),
+  you:t=>has(t,"有","没有"),
+  keyi:t=>has(t,"可以","能"),
+  redup:t=>has(t,"看看","一下"),
+  haishi:t=>has(t,"还是"),
+  temps:t=>has(t,"今天","明天","晚上","早上","现在","昨天"),
+  bei:t=>has(t,"被"),
+  guo:t=>has(t,"过"),
+  qing:t=>t[0]==="请",
+  gei:t=>has(t,"给"),
+  serie:t=>t.filter(x=>SERIE_V.has(x)).length>=2,
+  heure:t=>has(t,"几点","半")||t.some((x,i)=>x==="点"&&isNum(t[i-1]))
+};
+const gramFor=it=>GRAMMAR.filter(g=>GMATCH[g.id]&&GMATCH[g.id](words(it)));
+GRAMMAR.forEach(g=>{g.ex=g.e.map(toItem); const first=ITEMS.find(it=>GMATCH[g.id]&&GMATCH[g.id](words(it))); const [u,l]=first?[first.u,first.l]:g.at.split("-").map(Number); g.u=u; g.l=l;});
+GRAMMAR.sort((a,b)=>a.u-b.u||a.l-b.l);
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
 const lineVar=u=>`var(--l${u+1})`;
 function lum(hex){const m=/^#?([0-9a-f]{6})$/i.exec(hex||"");if(!m) return .2;const c=[0,2,4].map(i=>parseInt(m[1].substr(i,2),16)/255).map(v=>v<=.03928?v/12.92:((v+.055)/1.055)**2.4);return .2126*c[0]+.7152*c[1]+.0722*c[2]}
@@ -722,6 +772,11 @@ function tapWords(it,known,cls){
     line.append(b); if(punct) line.append(punct);});
   return {line,info};
 }
+function markGram(g){ if(P&&!(P.gs||[]).includes(g.id)){ P.gs=[...(P.gs||[]),g.id]; save(); } }
+function gramChips(it,label){
+  const all=gramFor(it).filter(g=>g.id!=="mots"), rest=all.filter(g=>g.id!=="svo"), gs=rest.length?rest:all; if(!gs.length) return null;
+  return h("div",{class:"gchips"},label?h("span",{class:"gchips-l"},label):null,gs.map(g=>h("button",{class:"gchip",onpointerdown:e=>e.stopPropagation(),onclick:e=>{e.stopPropagation();openGram(g);}},g.t)));
+}
 function formula(g){
   const ROLE={s:"Sujet",v:"Verbe",o:"Objet",n:"",q:"",t:""};
   return h("div",{class:"gform"},g.f.map(([r,z,lab])=>h("div",{class:"gb gb-"+r},/[\u4e00-\u9fff]/.test(z)?zhEl("b",z):h("b",null,z),h("span",null,lab||ROLE[r]))));
@@ -767,17 +822,18 @@ let mode="boot";     // boot | db | local
 let uid=null, db=null, userCap=null, canWrite=true;
 let view="path", leagueTab="week", scrolledToCurrent=false;
 
-function newPlayer(o){return {v:1,nick:o.nick,animal:o.animal,dep:o.dep,goal:o.goal,start:dayKey(),xp:0,wk:weekKey(),wkXp:0,streak:0,best:0,last:"",hist:{},done:{},sr:{},fc:[],upd:Date.now()}}
+function newPlayer(o){return {v:1,nick:o.nick,animal:o.animal,dep:o.dep,goal:o.goal,start:dayKey(),xp:0,wk:weekKey(),wkXp:0,streak:0,best:0,last:"",hist:{},done:{},sr:{},fc:[],gs:[],upd:Date.now()}}
 function clean(d){
   d=d&&typeof d==="object"?d:{};
   const num=v=>Number.isFinite(+v)?+v:0, str=(v,n)=>typeof v==="string"?v.slice(0,n):"";
   const done={}; if(d.done&&typeof d.done==="object") for(const n of NODES) if(num(d.done[n.id])>0) done[n.id]=num(d.done[n.id]);
   const hist={}; if(d.hist&&typeof d.hist==="object") for(const k in d.hist) if(/^\d{4}-\d\d-\d\d$/.test(k)) hist[k]=num(d.hist[k]);
   const sr={}; if(d.sr&&typeof d.sr==="object") for(const k in d.sr) if(ITEM_BY_KEY[k]&&Array.isArray(d.sr[k])) sr[k]=[num(d.sr[k][0]),num(d.sr[k][1])];
+  const gs=Array.isArray(d.gs)?[...new Set(d.gs.filter(k=>typeof k==="string"&&GRAMMAR.some(g=>g.id===k)))]:[];
   const fc=Array.isArray(d.fc)?[...new Set(d.fc.filter(k=>typeof k==="string"&&ITEM_BY_KEY[k]))].slice(0,300):[];
   return {v:1,nick:str(d.nick,24).trim()||"Voyageur",animal:Math.max(0,Math.min(11,num(d.animal)|0)),dep:/^\d{4}-\d\d-\d\d$/.test(d.dep)?d.dep:"2027-02-15",
     goal:[10,20,30,50].includes(num(d.goal))?num(d.goal):20,start:/^\d{4}-\d\d-\d\d$/.test(d.start)?d.start:dayKey(),xp:num(d.xp),wk:str(d.wk,10),wkXp:num(d.wkXp),
-    streak:num(d.streak),best:num(d.best),last:str(d.last,10),hist,done,sr,fc,upd:num(d.upd)};
+    streak:num(d.streak),best:num(d.best),last:str(d.last,10),hist,done,sr,fc,gs,upd:num(d.upd)};
 }
 const frontier=p=>{if(!p) return 0; const i=NODES.findIndex(n=>!p.done[n.id]); return i<0?NODES.length:i};
 const doneCount=p=>p?NODES.filter(n=>p.done[n.id]).length:0;
@@ -999,10 +1055,10 @@ function viewLex(){
 function viewGram(){
   const wrap=h("div");
   wrap.append(h("div",{class:"view-head"},h("div",null,h("div",{class:"kicker"},"Comprendre les phrases"),h("h1",null,"Grammaire"))));
-  wrap.append(h("p",{class:"muted",style:"margin:-6px 0 18px;max-width:60ch"},"Chaque leçon apparaît dans la station où la structure arrive pour la première fois. Tu peux aussi toutes les lire ici, dans l'ordre."));
+  wrap.append(h("p",{class:"muted",style:"margin:-6px 0 18px;max-width:60ch"},"Chaque leçon s'affiche la première fois que tu croises une phrase qui utilise cette structure, en leçon, en révision ou sur les cartes. Tu peux aussi toutes les lire ici, dans l'ordre où elles arrivent."));
   const list=h("div",{class:"glist"});
   GRAMMAR.forEach((g,i)=>{
-    const seen=P&&P.done[g.at];
+    const seen=P&&(P.gs||[]).includes(g.id);
     list.append(h("button",{class:"grow",onclick:()=>openGram(g)},
       h("span",{class:"gnum"},i+1),
       h("span",{style:"min-width:0"},h("b",null,g.t),h("span",{class:"gsub"},h("span",{class:"badge",style:`background:${lineVar(g.u)};color:${lineInk(g.u)}`},g.u+1),`Ligne ${g.u+1} · ${g.l<4?"Leçon "+(g.l+1):"Terminus"} · ${LINES[g.u].st[g.l][0]}`)),
@@ -1012,6 +1068,7 @@ function viewGram(){
   return wrap;
 }
 function openGram(g){
+  markGram(g);
   openModal(h("div",{class:"sheet gsheet"},h("div",null,h("div",{class:"kicker"},"Grammaire · Ligne "+(g.u+1)),h("h2",{style:"margin-top:6px"},g.t)),...grammarBody(g),h("button",{class:"btn ghost wide",onclick:closeModal},"Fermer")));
 }
 function norm(s){return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}
@@ -1027,7 +1084,7 @@ function fillLex(list){
     its.forEach(it=>{
       const s=P.sr[it.key]; const weak=s&&s[0]<=1;
       g.append(h("div",{class:"lex"},
-        h("div",{style:"min-width:0"},zhEl("b",it.zh),h("div",{class:"py"},it.py),h("div",{class:"fr"},it.fr,weak?h("span",{class:"weak"},"à revoir"):null)),
+        h("div",{style:"min-width:0"},zhEl("b",it.zh),h("div",{class:"py"},it.py),h("div",{class:"fr"},it.fr,weak?h("span",{class:"weak"},"à revoir"):null),gramChips(it)),
         h("div",{class:"acts"},h("button",{class:"iconbtn","aria-label":"Écouter",onclick:()=>say(it.zh)},icon("speaker")),h("button",{class:"iconbtn","aria-label":"Montrer en grand",title:"Montrer en grand",onclick:()=>showBig(it)},icon("show")))));
     });
     list.append(g);
@@ -1166,19 +1223,18 @@ function buildSteps(node){
   if(!node){ // révision rapide
     const w=weakest(learnedItems(P),10);
     w.forEach(it=>steps.push(makeStep(randType(it),it)));
-    return withMatch(steps,w.slice(0,5),4);
+    return injectGrammar(withMatch(steps,w.slice(0,5),4),2);
   }
   if(node.term){
     const pool=ITEMS.filter(x=>x.u===node.u), w=weakest(pool,12);
     w.forEach(it=>steps.push(makeStep(randType(it),it)));
-    return withMatch(shuffle(steps),shuffle(pool).slice(0,5),5);
+    return injectGrammar(withMatch(shuffle(steps),shuffle(pool).slice(0,5),5),2);
   }
   const its=ITEMS.filter(x=>x.u===node.u&&x.l===node.l), ls=LINES[node.u].L[node.l], first=!P.done[node.id];
   const mixed=[];
   if(first){
     // découverte : chaque phrase est présentée puis traduite du chinois vers le français
     its.forEach(it=>{steps.push(makeStep("intro",it)); steps.push(makeStep("zf",it));});
-    GRAMMAR.filter(g=>g.at===node.id).forEach(g=>steps.push({t:"gram",g}));
     steps.push(matchStep(its));
     its.forEach(it=>mixed.push(makeStep("fz",it)));
     shuffle(its.filter(it=>it.tok.length>=2)).slice(0,2).forEach(it=>mixed.push(makeStep("build",it)));
@@ -1188,7 +1244,19 @@ function buildSteps(node){
   }
   (ls.c||[]).forEach(c=>mixed.push(makeStep("ctx",its[c.a],{c})));
   const out=steps.concat(shuffle(mixed));
-  return first?out:withMatch(out,its,4);
+  return injectGrammar(first?out:withMatch(out,its,4),first?3:2);
+}
+// Insère, avant la première phrase qui l'utilise, chaque règle jamais expliquée (après la carte « nouvelle phrase »)
+function injectGrammar(steps,max){
+  const seen=new Set(P.gs||[]), out=[]; let n=0;
+  steps.forEach(st=>{
+    const its=st.t==="match"?st.items:st.it?[st.it]:[];
+    const todo=[]; its.forEach(it=>gramFor(it).forEach(g=>{ if(!seen.has(g.id)&&n+todo.length<max&&!todo.includes(g)) todo.push(g); }));
+    todo.forEach(g=>seen.add(g.id)); n+=todo.length;
+    const gs=todo.map(g=>({t:"gram",g}));
+    if(st.t==="intro") out.push(st,...gs); else out.push(...gs,st);
+  });
+  return out;
 }
 
 let L=null; // leçon en cours
@@ -1230,8 +1298,9 @@ function renderStep(){
   L.checkBtn=checkBtn;
   if(s.t==="match"){ renderMatch(s); return; }
   if(s.t==="gram"){
+    markGram(s.g);
     lessonFrame([h("div",{class:"q-kicker",style:`color:${lessonColor()}`},"Grammaire"),h("div",{class:"q-title"},s.g.t),...grammarBody(s.g)],
-      footer("",h("span",{class:"muted"},"Retrouve cette leçon dans l'onglet Grammaire."),h("button",{class:"btn",onclick:next},"Compris")));
+      footer("",h("span",{class:"muted"},"Pourquoi la phrase est construite comme ça. Tu la retrouves dans l'onglet Grammaire."),h("button",{class:"btn",onclick:next},"Compris")));
     return;
   }
   if(s.t==="intro"){
@@ -1239,6 +1308,7 @@ function renderStep(){
     body.push(h("div",{class:"card-new pop"},zhEl("div",it.zh,"zh"),h("div",{class:"py"},it.py),h("div",{class:"fr"},it.fr),it.note?h("div",{class:"note"},it.note):null,h("div",{class:"audio-row"},audioBtns(it.zh))));
     if(it.tok.length>1) body.push(h("div",{class:"q-kicker",style:"text-align:center;color:var(--muted)"},"Mot à mot"),wordChips(it,knownWords(L.node&&L.node.id)));
     else if(/litt\./.test(gloss(it.zh))) body.push(h("p",{class:"note",style:"text-align:center;margin:0 auto"},"Mot à mot : "+gloss(it.zh)));
+    body.push(gramChips(it,"Construction"));
     lessonFrame(body,footer("",h("span",{class:"muted"},"Écoute et répète à voix haute."),h("button",{class:"btn",onclick:next},"Continuer")));
     say(it.zh); return;
   }
@@ -1341,7 +1411,7 @@ function check(){
   sfx(ok?"ok":"bad"); say(it.zh);
   const content=h("div",{class:"fb"},h("span",{class:"fb-ico"},icon(ok?"check":"cross")),
     h("div",{style:"min-width:0"},h("h3",null,ok?pickOne(["Bravo !","Parfait !","Excellent !","太好了 !","Exact !"]):"Pas tout à fait"),
-      h("p",null,ok?"":"Bonne réponse : ",zhEl("b",it.zh)," · "+it.py),h("p",null,it.fr)));
+      h("p",null,ok?"":"Bonne réponse : ",zhEl("b",it.zh)," · "+it.py),h("p",null,it.fr),gramChips(it,"Construction")));
   const btn=h("button",{class:"btn "+(ok?"ok":"bad"),onclick:next},"Continuer");
   const el=$("#lesson"); el.replaceChild(footer(ok?"ok":"bad",content,btn),el.lastChild);
   if(!ok) el.querySelector(".l-body .l-wrap").classList.add("shake");
@@ -1426,7 +1496,7 @@ function renderCard(){
   const it=ITEM_BY_KEY[FC.deck[FC.i]]; FC.flipped=false;
   const face=(side)=>side==="fr"
     ?h("div",{class:"fc-face"},h("div",{class:"kicker"},"Français"),h("div",{class:"fc-fr"},it.fr))
-    :(()=>{const tw=tapWords(it,null,"fc-zh"); return h("div",{class:"fc-face"},h("div",{class:"kicker"},"Chinois"),tw.line,h("div",{class:"fc-py"},it.py),tw.info,h("div",{class:"audio-row",onpointerdown:e=>e.stopPropagation()},audioBtns(it.zh)));})();
+    :(()=>{const tw=tapWords(it,null,"fc-zh"); return h("div",{class:"fc-face"},h("div",{class:"kicker"},"Chinois"),tw.line,h("div",{class:"fc-py"},it.py),tw.info,gramChips(it),h("div",{class:"audio-row",onpointerdown:e=>e.stopPropagation()},audioBtns(it.zh)));})();
   const back=FC.front==="fr"?"zh":"fr";
   const inner=h("div",{class:"fc-inner"},h("div",{class:"fc-side front"},face(FC.front)),h("div",{class:"fc-side back"},face(back)));
   const card=h("div",{class:"fc-card",role:"button",tabindex:"0","aria-label":"Carte : touche pour retourner"},
