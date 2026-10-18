@@ -69,7 +69,7 @@ h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
 .chip.sync{font-weight:700;font-size:12px;color:var(--muted)}
 main{min-width:0;padding-block:18px 110px}
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--rule);
-  display:grid;grid-template-columns:repeat(4,1fr);
+  display:grid;grid-template-columns:repeat(5,1fr);
   padding:6px max(10px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
 .tab{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:12px;font:700 12px/1 var(--body);color:var(--muted)}
 .tab .ico{width:24px;height:24px}
@@ -349,6 +349,47 @@ main{min-width:0;padding-block:18px 110px}
 .fc-undo:disabled{color:var(--rule);border-color:var(--rule);box-shadow:0 3px 0 var(--rule);cursor:default}
 .l-body{overflow-x:hidden}
 
+.mam{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.wchip{position:relative;display:grid;justify-items:center;align-content:start;gap:2px;padding:9px 10px 8px;border-radius:12px;border:2px solid var(--rule);background:var(--surface);min-width:58px;max-width:150px}
+.wchip b{font:700 20px/1.15 var(--zh)}
+.wchip .p{font-size:12px;color:var(--sel);font-weight:700}
+.wchip .g{font-size:12px;line-height:1.25;color:var(--muted);text-align:center;text-wrap:balance}
+.wchip.new{border-color:var(--sel)}
+.newtag{display:inline-block;font:800 9px/1 var(--body);letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--sel);padding:3px 5px;border-radius:5px;margin-left:6px;vertical-align:2px}
+.wchip .newtag{position:absolute;top:-8px;left:50%;transform:translateX(-50%);margin:0}
+.words{display:block;padding-bottom:8px}
+.words .w{cursor:pointer;border-bottom:3px dotted var(--ctl);border-radius:4px;padding:0 1px}
+.words .w.new{border-bottom-color:var(--sel)}
+.words .w.on,.words .w:hover{background:var(--sel-bg)}
+.words .w:focus-visible{outline:3px solid var(--sel);outline-offset:2px}
+.winfo{font-size:15px;min-height:24px;color:var(--muted)}
+.winfo b{font:700 18px var(--zh);color:var(--ink)}
+.winfo .p{color:var(--sel);font-weight:700}
+.fc-face .words{font:700 clamp(40px,11vw,60px)/1.2 var(--zh)}
+.fc-face .winfo{text-align:center;max-width:30ch}
+.gform{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding-block:4px}
+.gb{display:grid;justify-items:center;gap:4px;min-width:64px;padding:10px 12px 8px;border-radius:14px;border:2px solid var(--gb);background:color-mix(in srgb,var(--gb) 14%,var(--surface))}
+.gb b{font:700 24px/1.1 var(--zh)}
+.gb span{font:800 11px/1 var(--body);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.gb-s{--gb:var(--l8)} .gb-v{--gb:var(--l1)} .gb-o{--gb:var(--l12)} .gb-n{--gb:var(--l7)} .gb-q{--gb:var(--l5)} .gb-t{--gb:var(--l2)}
+.gtext p{margin:0 0 10px;font-size:16px;line-height:1.55;max-width:62ch}
+.gtext p:last-child{margin:0}
+.gex{display:grid}
+.gex-row{display:grid;gap:10px;padding-block:14px;border-top:1px solid var(--rule)}
+.gex-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.gex-fr{font-weight:800;font-size:16px}
+.gex-py{color:var(--sel);font-weight:700;font-size:14px}
+.gex .mam{justify-content:flex-start}
+.glist{display:grid}
+.grow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:14px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:14px 6px;border-radius:0}
+.grow:hover{background:var(--surface)}
+.grow b{display:block;font:800 17px/1.3 var(--body)}
+.gnum{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--sunk);border:1px solid var(--rule);font:800 13px/1 var(--body);color:var(--muted);font-variant-numeric:tabular-nums}
+.gsub{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-top:3px}
+.gsub .badge{width:20px;height:20px;font-size:12px;border-radius:6px}
+.gsheet{max-width:620px}
+@media (max-width:420px){.tab{font-size:10.5px}}
+
 /* ---------- modal / toast ---------- */
 .modal{position:fixed;inset:0;z-index:80;background:var(--scrim);display:grid;place-items:end center;
   padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px))}
@@ -374,6 +415,7 @@ main{min-width:0;padding-block:18px 110px}
     <button class="navbtn" data-view="path"></button>
     <button class="navbtn" data-view="league"></button>
     <button class="navbtn" data-view="lex"></button>
+    <button class="navbtn" data-view="gram"></button>
     <button class="navbtn" data-view="me"></button>
   </aside>
   <div style="min-width:0">
@@ -388,6 +430,7 @@ main{min-width:0;padding-block:18px 110px}
     <button class="tab" data-view="path"></button>
     <button class="tab" data-view="league"></button>
     <button class="tab" data-view="lex"></button>
+    <button class="tab" data-view="gram"></button>
     <button class="tab" data-view="me"></button>
   </nav>
 </div>
@@ -473,6 +516,114 @@ const LINES=[
  {t:"Réserver",i:[["我|想|订|一张|桌子","wǒ|xiǎng|dìng|yì zhāng|zhuōzi","Je voudrais réserver une table"],["今天|晚上|四个|人","jīntiān|wǎnshang|sì ge|rén","Ce soir, quatre personnes"],["几点|开门？","jǐ diǎn|kāimén?","Ça ouvre à quelle heure ?"],["营业|到|几点？","yíngyè|dào|jǐ diǎn?","Vous êtes ouverts jusqu'à quelle heure ?"],["我|想|取消|预订","wǒ|xiǎng|qǔxiāo|yùdìng","Je voudrais annuler ma réservation"]],c:[{w:"Le restaurant",z:"几位？",p:"Jǐ wèi ?",f:"Pour combien de personnes ?",a:1}]}
 ]}
 ];
+// Sens de chaque mot (mot à mot)
+const GLOSS={"你好":"bonjour (litt. « toi bien »)","您好":"bonjour, poli (您 = vous)","再见":"au revoir (litt. « se revoir »)","谢谢":"merci","不客气":"de rien (litt. « pas de cérémonie »)",
+"对不起":"pardon, désolé","没关系":"pas grave (litt. « pas de rapport »)","请":"s'il vous plaît ; inviter","不好意思":"excusez-moi","麻烦":"déranger, embêter","你":"tu, toi",
+"是":"être (c'est)","不是":"ne pas être","对":"juste, exact","我":"je, moi","听不懂":"ne pas comprendre en écoutant","再":"encore, à nouveau","说":"parler, dire","一遍":"une fois de plus",
+"不":"ne… pas (négation)","会":"savoir (faire)","中文":"le chinois (langue)","英文":"l'anglais","吗":"? (question oui / non)","慢":"lent","一点":"un peu (plus)","好的":"d'accord",
+"厕所":"toilettes","在":"être à, se trouver ; à (lieu)","哪儿":"où","叫":"s'appeler ; appeler","什么":"quoi, quel","名字":"nom, prénom","学生":"étudiant(e)","法国人":"Français(e)",
+"哪国人":"de quel pays","很":"très (devant un adjectif)","高兴":"content","认识":"connaître, rencontrer","来自":"venir de","法国":"France","上海":"Shanghai","留学":"étudier à l'étranger",
+"交换生":"étudiant(e) en échange","学":"étudier, apprendre","商科":"commerce (études)","多大":"quel âge (litt. « combien grand »)","二十二":"vingt-deux","岁":"an (âge)","呢":"et… ? (renvoie la question)",
+"也":"aussi","住":"habiter","的":"de (possession : 我的 = mon)","好":"bien, bon","第一次":"la première fois","来":"venir","中国":"Chine","喜欢":"aimer","中国菜":"cuisine chinoise","法语":"le français (langue)",
+"一":"un (1)","二":"deux (2)","三":"trois (3)","四":"quatre (4)","五":"cinq (5)","六":"six (6)","七":"sept (7)","八":"huit (8)","九":"neuf (9)","十":"dix (10)","零":"zéro","二十":"vingt",
+"五十":"cinquante","一百":"cent","两":"deux (avant un classificateur)","多少":"combien","钱":"argent","三十":"trente","块":"yuan (familier)","这个":"ce, celui-ci","太":"trop","贵":"cher",
+"了":"c'est fait / ça a changé","便宜":"pas cher","吧":"proposition (« allez », « non ? »)","有":"avoir, il y a","预订":"réservation","要":"vouloir, prendre","办":"faire (une démarche)",
+"入住":"check-in","这":"ce, ceci","护照":"passeport","订":"réserver","晚":"nuit ; tard","空":"libre, vide","房间":"chambre","几":"combien, quel (petit nombre)","楼":"étage","押金":"caution",
+"早餐":"petit-déjeuner","几点":"quelle heure","WiFi":"wifi","密码":"mot de passe","电梯":"ascenseur","空调":"climatisation","坏":"cassé, en panne","没有":"ne pas avoir, il n'y a pas",
+"热水":"eau chaude","房卡":"carte de la chambre","能":"pouvoir (c'est possible)","用":"utiliser","可以":"pouvoir (permission)","换":"changer","帮":"aider","一下":"un instant, un peu (adoucit)",
+"退房":"check-out","寄存":"laisser en consigne","行李":"bagages","一辆":"un (véhicule)","出租车":"taxi","开":"ouvrir ; conduire ; établir","发票":"facture","位":"personne (poli)",
+"位子":"place, table","给":"donner ; pour","菜单":"menu","服务员":"serveur, serveuse","碗":"bol","面":"nouilles","一份":"une portion","饺子":"raviolis","推荐":"recommander",
+"就":"juste, seulement","这些":"ces, ceux-ci","米饭":"riz","鸡肉":"poulet","杯":"verre, tasse","水":"eau","瓶":"bouteille","啤酒":"bière","冰":"glacé","这儿":"ici","吃":"manger",
+"带":"emporter","走":"partir, marcher","打包":"emballer à emporter","等":"attendre","多久":"combien de temps","扫码":"scanner le QR code","点餐":"commander à manger","辣":"épicé",
+"不要":"ne pas vouloir, sans","微辣":"un peu épicé","好吃":"bon (à manger)","咸":"salé","肉":"viande","素":"végétarien (litt. « simple »)","花生":"cacahuète","过敏":"allergique",
+"香菜":"coriandre","猪肉":"porc","买单":"payer l'addition","刷卡":"payer par carte","支付宝":"Alipay","扫":"scanner","我们":"nous","AA":"chacun paie sa part","筷子":"baguettes",
+"一个":"un (objet)","勺子":"cuillère","吃饱":"rassasié","干杯":"santé ! (litt. « vider le verre »)","师傅":"chauffeur, maître (respectueux)","去":"aller","到":"arriver ; jusqu'à",
+"地址":"adresse","停":"s'arrêter","地铁站":"station de métro","外滩":"le Bund","怎么":"comment","坐":"prendre (un transport) ; s'asseoir","号":"numéro","线":"ligne","换乘":"changer de ligne",
+"下":"prochain ; descendre","站":"station","左边":"à gauche","右边":"à droite","一直":"tout droit","远":"loin","近":"près","火车站":"gare","机场":"aéroport","一张":"un (objet plat : billet, table)",
+"北京":"Pékin","票":"billet","出发":"partir","迷路":"se perdre","看看":"jeter un œil","别的":"autre","颜色":"couleur","试":"essayer","大":"grand","小":"petit","点":"un peu ; heure",
+"行":"ça va, OK","最":"le plus","低":"bas","成交":"marché conclu","两个":"deux (objets)","充电器":"chargeur","微信":"WeChat","一斤":"un jīn (500 g)","苹果":"pomme","一点儿":"un peu",
+"多":"beaucoup","够":"assez","还":"encore","加":"ajouter","个":"classificateur général","还是":"ou (dans une question)","发":"envoyer","保持":"garder","联系":"contact","今天":"aujourd'hui",
+"一起":"ensemble","吃饭":"manger (un repas)","见":"voir, se retrouver","图书馆":"bibliothèque","食堂":"cantine","宿舍":"résidence étudiante","教室":"salle de cours","迟到":"être en retard",
+"喝":"boire","累":"fatigué","明天":"demain","救命":"au secours (litt. « sauver la vie »)","需要":"avoir besoin de","帮助":"aide","舒服":"bien, à l'aise","医院":"hôpital","救护车":"ambulance",
+"头疼":"mal de tête","肚子":"ventre","疼":"avoir mal","发烧":"avoir de la fièvre","感冒":"rhume, s'enrhumer","药店":"pharmacie","手机":"téléphone portable","丢":"perdre","钱包":"portefeuille",
+"被":"se faire… (passif)","偷":"voler, dérober","警察":"police","找不到":"ne pas trouver","酒店":"hôtel","打":"passer (un appel) ; frapper","电话":"téléphone, appel","没":"ne pas (avec 有 ou au passé)",
+"电":"électricité, batterie","借":"emprunter","充电宝":"batterie externe","这里":"ici","外国人":"étranger, étrangère","写":"écrire","下来":"vers le bas (写下来 = noter)","天气":"météo",
+"怎么样":"comment (ça va, c'est)","热":"chaud","冷":"froid","下雨":"pleuvoir","伞":"parapluie","看":"regarder","电影":"film","运动":"sport","真的":"vraiment","事":"chose, souci",
+"知道":"savoir","当然":"bien sûr","觉得":"trouver, penser","过":"avoir déjà fait","巴黎":"Paris","人":"personne","菜":"plat, cuisine","漂亮":"beau, joli","昨天":"hier","周末":"week-end",
+"星期一":"lundi","现在":"maintenant","半":"demi","早上":"matin","晚上":"soir","马上":"tout de suite","改天":"un autre jour","想":"aimerait, vouloir (doux)","桌子":"table",
+"四个":"quatre (personnes, objets)","开门":"ouvrir","营业":"être ouvert (commerce)","取消":"annuler"};
+// Leçons de grammaire. at = station où elles apparaissent ; f = structure [rôle, mot, étiquette] ; e = exemples (mêmes règles que les phrases)
+const GRAMMAR=[
+ {id:"mots",at:"0-0",t:"Un caractère, une syllabe",f:[["s","你","toi"],["v","好","bien"]],
+  x:["Chaque caractère se prononce en une seule syllabe et a son propre sens. Les mots se forment en collant des caractères : 你 (toi) + 好 (bien) donne 你好, bonjour.","Il n'y a ni espace entre les mots, ni conjugaison, ni masculin ou féminin. Le pinyin, écrit en lettres, sert seulement à lire la prononciation."],
+  e:[["你好","nǐ hǎo","Bonjour"],["再见","zàijiàn","Au revoir"],["谢谢","xièxie","Merci"]]},
+ {id:"bu",at:"0-2",t:"不 : la négation",f:[["s","我","Sujet"],["n","不","pas"],["v","吃","Verbe"],["o","肉","Objet"]],
+  x:["不 bù se place juste devant le verbe ou l'adjectif qu'il nie, jamais à la fin : 是 (être) devient 不是 (ne pas être).","Il se prononce bú devant un 4e ton : 不是 bú shì, 不要 bú yào. Une exception : pour 有 (avoir), on dit 没有."],
+  e:[["不是","bú shì","Non, ce n'est pas ça"],["我|不|吃|肉","wǒ|bù|chī|ròu","Je ne mange pas de viande"],["不要|辣","bú yào|là","Pas épicé"]]},
+ {id:"ma",at:"0-3",t:"吗 : poser une question",f:[["s","你","Sujet"],["v","会说","Verbe"],["o","英文","Objet"],["q","吗","?"]],
+  x:["Pour une question à laquelle on répond par oui ou non, on garde la phrase normale et on ajoute 吗 à la fin. L'ordre des mots ne change pas.","Pour répondre oui, on répète le verbe : 会 (je sais). Pour non : 不会."],
+  e:[["你|会|说|英文|吗？","nǐ|huì|shuō|Yīngwén|ma?","Vous parlez anglais ?"],["有|空|房间|吗？","yǒu|kòng|fángjiān|ma?","Vous avez une chambre libre ?"],["远|吗？","yuǎn|ma?","C'est loin ?"]]},
+ {id:"zai",at:"0-3",t:"在哪儿 : où est… ?",f:[["s","厕所","Chose"],["v","在","se trouve"],["q","哪儿","où"]],
+  x:["在 veut dire « se trouver à ». Pour demander où est quelque chose : la chose, puis 在哪儿 ?","Le mot question reste à la place de la réponse : 厕所在哪儿？ (les toilettes sont où ?) → 厕所在这儿 (les toilettes sont ici)."],
+  e:[["厕所|在|哪儿？","cèsuǒ|zài|nǎr?","Où sont les toilettes ?"],["电梯|在|哪儿？","diàntī|zài|nǎr?","Où est l'ascenseur ?"],["地铁站|在|哪儿？","dìtiě zhàn|zài|nǎr?","Où est la station de métro ?"]]},
+ {id:"shi",at:"1-0",t:"是 : être + nom",f:[["s","我","Sujet"],["v","是","être"],["o","学生","Nom"]],
+  x:["是 relie deux choses : « A est B ». Il ne change jamais : 我是, 你是, 我们是.","On ne l'utilise pas devant un adjectif : pour « je suis content », on dit 我很高兴 (voir 很)."],
+  e:[["我|是|学生","wǒ|shì|xuésheng","Je suis étudiant(e)"],["我|是|法国人","wǒ|shì|Fǎguó rén","Je suis français(e)"],["我|是|交换生","wǒ|shì|jiāohuànshēng","Je suis étudiant(e) en échange"]]},
+ {id:"hen",at:"1-0",t:"很 + adjectif",f:[["s","我","Sujet"],["n","很","très"],["v","高兴","Adjectif"]],
+  x:["En chinois, un adjectif fonctionne comme un verbe : pas besoin de 是. On dit 我很高兴 (je suis content), jamais 我是高兴.","很 veut dire « très », mais il sert souvent juste à relier : 今天很热 = il fait chaud aujourd'hui."],
+  e:[["很|高兴|认识|你","hěn|gāoxìng|rènshi|nǐ","Ravi(e) de te rencontrer"],["今天|很|热","jīntiān|hěn|rè","Il fait chaud aujourd'hui"],["上海|很|漂亮","Shànghǎi|hěn|piàoliang","Shanghai est très belle"]]},
+ {id:"svo",at:"1-1",t:"Sujet + verbe + objet",f:[["s","我","Qui"],["v","学","Action"],["o","商科","Quoi"]],
+  x:["Comme en français : qui fait l'action, l'action, puis sur quoi elle porte.","Les verbes ne se conjuguent jamais : 我学, 你学, 我们学. Le passé ou le futur se comprennent grâce au contexte ou à des mots comme 今天, 明天."],
+  e:[["我|学|商科","wǒ|xué|shāngkē","J'étudie le commerce"],["我|来自|法国","wǒ|láizì|Fǎguó","Je viens de France"],["我|喜欢|中国菜","wǒ|xǐhuan|Zhōngguó cài","J'aime la cuisine chinoise"]]},
+ {id:"lieu",at:"1-1",t:"Le lieu se place avant le verbe",f:[["s","我","Qui"],["t","在上海","Où"],["v","留学","Action"]],
+  x:["Contrairement au français, l'endroit où l'on fait quelque chose se met avant le verbe, avec 在 : 我在上海留学 = « moi à Shanghai étudier ».","Au restaurant, 在这儿吃 (ici manger) veut dire « sur place »."],
+  e:[["我|在|上海|留学","wǒ|zài|Shànghǎi|liúxué","Je fais mes études à Shanghai"],["在|这儿|吃","zài|zhèr|chī","Sur place"],["在|这儿|停","zài|zhèr|tíng","Arrêtez-vous ici"]]},
+ {id:"wh",at:"1-2",t:"Le mot question reste à sa place",f:[["s","你","Sujet"],["v","住在","Verbe"],["q","哪儿","où ?"]],
+  x:["On ne déplace pas le mot interrogatif au début comme en français : il prend la place exacte de la réponse. 你住在哪儿？ (tu habites où ?) → 我住在上海.","Avec ces mots, pas besoin de 吗 : 什么 (quoi), 哪儿 (où), 几 et 多少 (combien), 怎么 (comment)."],
+  e:[["你|住|在|哪儿？","nǐ|zhù|zài|nǎr?","Tu habites où ?"],["你|叫|什么|名字？","nǐ|jiào|shénme|míngzi?","Comment tu t'appelles ?"],["你|学|什么？","nǐ|xué|shénme?","Tu étudies quoi ?"]]},
+ {id:"ne",at:"1-2",t:"呢 et 也",f:[["s","你","toi"],["q","呢","et… ?"]],
+  x:["呢 renvoie la question : après avoir répondu, 你呢？ veut dire « et toi ? ».","也 (aussi) se place toujours avant le verbe : 我也是 (moi aussi), 我也喜欢 (j'aime aussi)."],
+  e:[["你|呢？","nǐ|ne?","Et toi ?"],["我|也|是","wǒ|yě|shì","Moi aussi"]]},
+ {id:"de",at:"1-3",t:"的 : mon, ton, de",f:[["s","我","À qui"],["n","的","de"],["o","中文","Quoi"]],
+  x:["的 relie le possesseur à ce qu'il possède, dans l'ordre inverse du français : 我的护照 = « moi de passeport », mon passeport.","我的 = mon, 你的 = ton, 我们的 = notre."],
+  e:[["我|的|中文|不|好","wǒ|de|Zhōngwén|bù|hǎo","Mon chinois n'est pas bon"],["这|是|我|的|护照","zhè|shì|wǒ|de|hùzhào","Voici mon passeport"],["我|的|手机|丢|了","wǒ|de|shǒujī|diū|le","J'ai perdu mon téléphone"]]},
+ {id:"cl",at:"2-2",t:"Nombre + classificateur + nom",f:[["n","一","Nombre"],["v","杯","Mesure"],["o","水","Nom"]],
+  x:["On ne peut pas dire « un eau » : entre le nombre et le nom, on met un mot de mesure. 个 ge marche presque partout.","Les autres dépendent de la forme : 杯 (verre), 瓶 (bouteille), 碗 (bol), 张 (objet plat : billet, table), 位 (personne, poli). Pour « deux », on dit 两 et pas 二 : 两个, 两位."],
+  e:[["一|杯|水","yì|bēi|shuǐ","Un verre d'eau"],["一|碗|面","yì|wǎn|miàn","Un bol de nouilles"],["两|位","liǎng|wèi","Deux personnes"]]},
+ {id:"le",at:"2-3",t:"了 : c'est fait, ça a changé",f:[["n","太","trop"],["v","贵","Adjectif"],["q","了","了"]],
+  x:["了 le en fin de phrase signale un changement ou une action terminée : 我到了 (je suis arrivé), 空调坏了 (la clim est tombée en panne).","Avec 太, on obtient 太…了 = « trop… » : 太贵了, c'est trop cher ; 太好了, génial !"],
+  e:[["太|贵|了","tài|guì|le","C'est trop cher"],["我|到|了","wǒ|dào|le","Je suis arrivé(e)"],["空调|坏|了","kōngtiáo|huài|le","La clim est en panne"]]},
+ {id:"ba",at:"2-3",t:"吧 et 一点 : demander gentiment",f:[["v","便宜","Adjectif"],["n","一点","un peu plus"],["q","吧","allez"]],
+  x:["吧 ba en fin de phrase transforme une phrase en proposition sympathique : 一起去吃饭吧 = allons manger ensemble !","一点 après un adjectif veut dire « un peu plus » : 慢一点 (plus lentement), 便宜一点 (un peu moins cher)."],
+  e:[["便宜|一点|吧","piányi|yìdiǎn|ba","Un peu moins cher ?"],["一起|去|吃饭|吧","yìqǐ|qù|chīfàn|ba","Allons manger ensemble"],["慢|一点","màn|yìdiǎn","Plus lentement, s'il vous plaît"]]},
+ {id:"yao",at:"3-0",t:"要 et 想 : vouloir",f:[["s","我","Sujet"],["v","要","veux"],["o","这个","Quoi"]],
+  x:["要 yào = je veux, je prends. C'est direct mais normal au restaurant ou au magasin, pas impoli. Pour refuser : 不要.","想 xiǎng est plus doux : « j'aimerais ». Pratique pour réserver ou demander un service."],
+  e:[["我|要|这个","wǒ|yào|zhège","Je prends ça"],["我|要|退房","wǒ|yào|tuìfáng","Je voudrais faire le check-out"],["我|想|订|一张|桌子","wǒ|xiǎng|dìng|yì zhāng|zhuōzi","Je voudrais réserver une table"]]},
+ {id:"you",at:"3-0",t:"有 / 没有 : avoir, il y a",f:[["s","我","Sujet"],["v","有","avoir"],["o","预订","Quoi"]],
+  x:["有 veut dire à la fois « avoir » et « il y a ». Sa négation est toujours 没有, jamais 不有 : 没有热水, il n'y a pas d'eau chaude.","Pour demander si quelque chose existe : 有…吗？ = vous avez… ?"],
+  e:[["我|有|预订","wǒ|yǒu|yùdìng","J'ai une réservation"],["有|英文|菜单|吗？","yǒu|Yīngwén|càidān|ma?","Vous avez un menu en anglais ?"],["没有|热水","méiyǒu|rèshuǐ","Il n'y a pas d'eau chaude"]]},
+ {id:"keyi",at:"3-2",t:"可以 et 能 : pouvoir",f:[["v","可以","Pouvoir"],["o","换房间","Action"],["q","吗","?"]],
+  x:["可以 kěyǐ demande la permission : 可以换房间吗？ (je peux changer de chambre ?). Réponse : 可以 (oui) ou 不可以 (non).","能 néng parle de ce qui est possible : 房卡不能用, la carte ne marche pas. Verbe + 一下 rend une demande plus polie : 帮我一下."],
+  e:[["可以|换|房间|吗？","kěyǐ|huàn|fángjiān|ma?","Je peux changer de chambre ?"],["房卡|不|能|用","fángkǎ|bù|néng|yòng","La carte de la chambre ne marche pas"],["请|帮|我|一下","qǐng|bāng|wǒ|yíxià","Vous pouvez m'aider ?"]]},
+ {id:"redup",at:"7-0",t:"看看, 试一下 : juste un peu",f:[["s","我","Sujet"],["v","看看","regarder un peu"]],
+  x:["Doubler un verbe, ou ajouter 一下 après lui, rend l'action courte et légère : 看 (regarder) → 看看 (jeter un œil), 试 → 试一下 (essayer vite fait).","C'est aussi plus poli quand on demande quelque chose."],
+  e:[["我|看看","wǒ|kànkan","Je regarde juste"],["可以|试|一下|吗？","kěyǐ|shì|yíxià|ma?","Je peux essayer ?"],["等|一下","děng|yíxià","Attends une seconde"]]},
+ {id:"haishi",at:"8-0",t:"还是 : ou bien ?",f:[["o","A","choix 1"],["q","还是","ou"],["o","B","choix 2"]],
+  x:["Pour proposer un choix dans une question, on met 还是 entre les deux options. Pas besoin de 吗.","微信还是支付宝？ = WeChat ou Alipay ? On l'entend partout à la caisse."],
+  e:[["我|扫|你|还是|你|扫|我？","wǒ|sǎo|nǐ|háishi|nǐ|sǎo|wǒ?","Je te scanne ou tu me scannes ?"],["在|这儿|吃|还是|带|走？","zài|zhèr|chī|háishi|dài|zǒu?","Sur place ou à emporter ?"]]},
+ {id:"temps",at:"8-1",t:"Le moment se place avant le verbe",f:[["s","你","Qui"],["t","今天","Quand"],["v","有空","Action"],["q","吗","?"]],
+  x:["Le moment (aujourd'hui, demain, à 7 h) se met au début, ou juste après le sujet, toujours avant le verbe.","Ordre typique : qui + quand + où + action. 明天晚上七点见 = « demain soir 7 h se voir »."],
+  e:[["你|今天|有|空|吗？","nǐ|jīntiān|yǒu|kòng|ma?","Tu es libre aujourd'hui ?"],["明天|晚上|七|点|见","míngtiān|wǎnshang|qī|diǎn|jiàn","On se voit demain à 19 h"],["明天|见","míngtiān|jiàn","À demain"]]},
+ {id:"bei",at:"9-2",t:"被 : se faire…",f:[["s","钱包","Chose"],["n","被","se faire"],["v","偷了","Action"]],
+  x:["被 bèi indique qu'on a subi l'action, souvent quelque chose de désagréable : 我的钱包被偷了, mon portefeuille s'est fait voler.","Tu le croiseras surtout pour parler de vols ou d'accidents."],
+  e:[["我|的|钱包|被|偷|了","wǒ|de|qiánbāo|bèi|tōu|le","On m'a volé mon portefeuille"]]},
+ {id:"guo",at:"10-3",t:"过 : avoir déjà fait",f:[["s","你","Qui"],["v","去","Verbe"],["n","过","déjà"],["o","法国","Où"],["q","吗","?"]],
+  x:["过 guo juste après un verbe veut dire « l'avoir déjà fait au moins une fois » : 你去过法国吗？ = tu es déjà allé(e) en France ?","Réponse : 去过 (oui) ou 没去过 (non, jamais)."],
+  e:[["你|去|过|法国|吗？","nǐ|qù|guo|Fǎguó|ma?","Tu es déjà allé(e) en France ?"],["我|没|去|过|北京","wǒ|méi|qù|guo|Běijīng","Je ne suis jamais allé(e) à Pékin"]]},
+ {id:"heure",at:"11-1",t:"L'heure : 点 et 半",f:[["n","八","Nombre"],["v","点","heure"],["o","半","et demie"]],
+  x:["Pour dire l'heure : nombre + 点. 三点 = 3 h, 八点半 = 8 h 30.","Le matin (早上) ou le soir (晚上) se place avant : 晚上七点 = 19 h. Pour demander : 几点？"],
+  e:[["现在|几点？","xiànzài|jǐ diǎn?","Quelle heure est-il ?"],["八|点|半","bā|diǎn|bàn","Huit heures et demie"],["晚上|七|点","wǎnshang|qī|diǎn","19 h"]]}
+];
 const ZODIAC=[["鼠","Rat"],["牛","Buffle"],["虎","Tigre"],["兔","Lapin"],["龙","Dragon"],["蛇","Serpent"],["马","Cheval"],["羊","Chèvre"],["猴","Singe"],["鸡","Coq"],["狗","Chien"],["猪","Cochon"]];
 
 /* ================== INDEX ================== */
@@ -488,6 +639,8 @@ LINES.forEach((ln,u)=>{
   for(let l=0;l<5;l++) NODES.push({id:u+"-"+l,u,l,term:l===4,st:ln.st[l],title:l<4?ln.L[l].t:"Révision de la ligne"});
 });
 const ITEM_BY_KEY=Object.fromEntries(ITEMS.map(x=>[x.key,x]));
+function toItem(r){const tok=r[0].split("|"),pyt=r[1].split("|"),zh=tok.join("");return {key:zh.replace(PUNCT,""),tok,pyt,zh,py:cap(pyt.join(" ").replace(/\s+([?!])/g," $1")),fr:r[2]};}
+GRAMMAR.forEach(g=>{g.ex=g.e.map(toItem); const [u,l]=g.at.split("-").map(Number); g.u=u; g.l=l;});
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
 const lineVar=u=>`var(--l${u+1})`;
 function lum(hex){const m=/^#?([0-9a-f]{6})$/i.exec(hex||"");if(!m) return .2;const c=[0,2,4].map(i=>parseInt(m[1].substr(i,2),16)/255).map(v=>v<=.03928?v/12.92:((v+.055)/1.055)**2.4);return .2126*c[0]+.7152*c[1]+.0722*c[2]}
@@ -530,6 +683,7 @@ const ICONS={
  close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
  cross:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"/></svg>',
+ gram:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="6" height="6" rx="1.5"/><rect x="15" y="5" width="6" height="6" rx="1.5"/><path d="M11 8h2"/><path d="M4 16h16M4 20h10"/></svg>',
  undo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>',
  review:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v5h-5"/></svg>',
  show:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg>'
@@ -538,6 +692,47 @@ const icon=n=>h("span",{class:"ico","aria-hidden":"true",html:ICONS[n]});
 function seal(animal,size=36){
   const a=((animal|0)%12+12)%12;
   return h("span",{class:"seal",title:ZODIAC[a][1],style:`width:${size}px;height:${size}px;font-size:${Math.round(size*.52)}px;background:var(--l${a+1});color:${lineInk(a)}`},zhEl("span",ZODIAC[a][0]));
+}
+
+/* ================== MOT À MOT ================== */
+const gloss=z=>GLOSS[z.replace(PUNCT,"")]||"";
+function knownWords(exceptNode){
+  const set=new Set();
+  if(P) ITEMS.forEach(it=>{ const id=it.u+"-"+it.l; if(P.done[id]&&id!==exceptNode) it.tok.forEach(t=>set.add(t.replace(PUNCT,""))); });
+  return set;
+}
+// Puces « mot à mot » : caractère, pinyin, sens ; les mots jamais vus sont signalés
+function wordChips(it,known){
+  return h("div",{class:"mam"},it.tok.map((tk,i)=>{const z=tk.replace(PUNCT,""); if(!z) return null; const isNew=known&&!known.has(z);
+    return h("button",{class:"wchip"+(isNew?" new":""),onclick:()=>say(z),title:"Écouter"},isNew?h("span",{class:"newtag"},"nouveau"):null,zhEl("b",z),h("span",{class:"p"},it.pyt[i].replace(PUNCT,"").trim()),h("span",{class:"g"},gloss(z)));}));
+}
+// Phrase chinoise où chaque mot se touche (ou se survole) pour voir sa traduction
+function tapWords(it,known,cls){
+  const info=h("div",{class:"winfo"},"Touche un mot pour voir sa traduction.");
+  const line=h("div",{class:"words "+(cls||""),lang:"zh-CN"});
+  const show=(b,z,py)=>{line.querySelectorAll(".w").forEach(x=>x.classList.toggle("on",x===b)); const isNew=known&&!known.has(z);
+    info.replaceChildren(...[zhEl("b",z)," ",h("span",{class:"p"},py)," · "+(gloss(z)||"—"),isNew?h("span",{class:"newtag"},"nouveau"):null].filter(Boolean));};
+  it.tok.forEach((tk,i)=>{const z=tk.replace(PUNCT,""), punct=tk.slice(z.length), py=it.pyt[i].replace(PUNCT,"").trim();
+    if(!z){line.append(tk);return;}
+    const b=h("span",{class:"w"+(known&&!known.has(z)?" new":""),tabindex:"0",role:"button"},z);
+    b.addEventListener("pointerdown",e=>e.stopPropagation());
+    b.addEventListener("click",e=>{e.stopPropagation();show(b,z,py);say(z);});
+    b.addEventListener("mouseenter",()=>show(b,z,py));
+    b.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();e.stopPropagation();show(b,z,py);say(z);}});
+    line.append(b); if(punct) line.append(punct);});
+  return {line,info};
+}
+function formula(g){
+  const ROLE={s:"Sujet",v:"Verbe",o:"Objet",n:"",q:"",t:""};
+  return h("div",{class:"gform"},g.f.map(([r,z,lab])=>h("div",{class:"gb gb-"+r},/[\u4e00-\u9fff]/.test(z)?zhEl("b",z):h("b",null,z),h("span",null,lab||ROLE[r]))));
+}
+function grammarBody(g){
+  return [formula(g),
+    h("div",{class:"gtext"},g.x.map(t=>h("p",null,t))),
+    h("div",{class:"kicker"},"Exemples"),
+    h("div",{class:"gex"},g.ex.map(ex=>h("div",{class:"gex-row"},
+      h("div",{class:"gex-top"},h("div",{style:"min-width:0"},h("div",{class:"gex-fr"},ex.fr),h("div",{class:"gex-py"},ex.py)),h("button",{class:"iconbtn","aria-label":"Écouter",onclick:()=>say(ex.zh)},icon("speaker"))),
+      wordChips(ex,null))))];
 }
 
 /* ================== AUDIO ================== */
@@ -610,7 +805,7 @@ function flush(){
 }
 
 /* ================== RENDU : COQUILLE ================== */
-const VIEWS={path:["Parcours","path"],league:["Classement","league"],lex:["Lexique","lex"],me:["Profil","me"]};
+const VIEWS={path:["Parcours","path"],league:["Classement","league"],lex:["Lexique","lex"],gram:["Grammaire","gram"],me:["Profil","me"]};
 document.querySelectorAll("[data-view]").forEach(b=>{
   const [lab,ic]=VIEWS[b.dataset.view]; b.append(icon(ic),h("span",null,lab));
   b.addEventListener("click",()=>go(b.dataset.view));
@@ -630,6 +825,7 @@ function renderMain(){
   if(view==="path") m.append(viewPath());
   else if(view==="league") m.append(viewLeague());
   else if(view==="lex") m.append(viewLex());
+  else if(view==="gram") m.append(viewGram());
   else m.append(viewMe());
   if(view==="path"&&!scrolledToCurrent&&P&&doneCount(P)>0){
     scrolledToCurrent=true; const cur=m.querySelector(".st.current"); if(cur) requestAnimationFrame(()=>cur.scrollIntoView({block:"center"}));
@@ -800,6 +996,24 @@ function viewLex(){
   wrap.append(inp,list); fillLex(list);
   return wrap;
 }
+function viewGram(){
+  const wrap=h("div");
+  wrap.append(h("div",{class:"view-head"},h("div",null,h("div",{class:"kicker"},"Comprendre les phrases"),h("h1",null,"Grammaire"))));
+  wrap.append(h("p",{class:"muted",style:"margin:-6px 0 18px;max-width:60ch"},"Chaque leçon apparaît dans la station où la structure arrive pour la première fois. Tu peux aussi toutes les lire ici, dans l'ordre."));
+  const list=h("div",{class:"glist"});
+  GRAMMAR.forEach((g,i)=>{
+    const seen=P&&P.done[g.at];
+    list.append(h("button",{class:"grow",onclick:()=>openGram(g)},
+      h("span",{class:"gnum"},i+1),
+      h("span",{style:"min-width:0"},h("b",null,g.t),h("span",{class:"gsub"},h("span",{class:"badge",style:`background:${lineVar(g.u)};color:${lineInk(g.u)}`},g.u+1),`Ligne ${g.u+1} · ${g.l<4?"Leçon "+(g.l+1):"Terminus"} · ${LINES[g.u].st[g.l][0]}`)),
+      h("span",{class:"st-state"},seen?"Vue":"À venir")));
+  });
+  wrap.append(list);
+  return wrap;
+}
+function openGram(g){
+  openModal(h("div",{class:"sheet gsheet"},h("div",null,h("div",{class:"kicker"},"Grammaire · Ligne "+(g.u+1)),h("h2",{style:"margin-top:6px"},g.t)),...grammarBody(g),h("button",{class:"btn ghost wide",onclick:closeModal},"Fermer")));
+}
 function norm(s){return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}
 function fillLex(list){
   list.replaceChildren();
@@ -964,6 +1178,7 @@ function buildSteps(node){
   if(first){
     // découverte : chaque phrase est présentée puis traduite du chinois vers le français
     its.forEach(it=>{steps.push(makeStep("intro",it)); steps.push(makeStep("zf",it));});
+    GRAMMAR.filter(g=>g.at===node.id).forEach(g=>steps.push({t:"gram",g}));
     steps.push(matchStep(its));
     its.forEach(it=>mixed.push(makeStep("fz",it)));
     shuffle(its.filter(it=>it.tok.length>=2)).slice(0,2).forEach(it=>mixed.push(makeStep("build",it)));
@@ -1014,10 +1229,16 @@ function renderStep(){
   const checkBtn=h("button",{class:"btn",disabled:true,onclick:()=>check()},"Vérifier");
   L.checkBtn=checkBtn;
   if(s.t==="match"){ renderMatch(s); return; }
+  if(s.t==="gram"){
+    lessonFrame([h("div",{class:"q-kicker",style:`color:${lessonColor()}`},"Grammaire"),h("div",{class:"q-title"},s.g.t),...grammarBody(s.g)],
+      footer("",h("span",{class:"muted"},"Retrouve cette leçon dans l'onglet Grammaire."),h("button",{class:"btn",onclick:next},"Compris")));
+    return;
+  }
   if(s.t==="intro"){
     body.push(h("div",{class:"q-kicker",style:`color:${lessonColor()}`},"Nouvelle phrase"));
     body.push(h("div",{class:"card-new pop"},zhEl("div",it.zh,"zh"),h("div",{class:"py"},it.py),h("div",{class:"fr"},it.fr),it.note?h("div",{class:"note"},it.note):null,h("div",{class:"audio-row"},audioBtns(it.zh))));
-    if(it.tok.length>1) body.push(h("div",{class:"bank"},it.tok.map((tk,i)=>h("button",{class:"tile",onclick:()=>say(tk.replace(PUNCT,""))},zhEl("b",tk.replace(PUNCT,"")),h("span",null,it.pyt[i].replace(PUNCT,""))))));
+    if(it.tok.length>1) body.push(h("div",{class:"q-kicker",style:"text-align:center;color:var(--muted)"},"Mot à mot"),wordChips(it,knownWords(L.node&&L.node.id)));
+    else if(/litt\./.test(gloss(it.zh))) body.push(h("p",{class:"note",style:"text-align:center;margin:0 auto"},"Mot à mot : "+gloss(it.zh)));
     lessonFrame(body,footer("",h("span",{class:"muted"},"Écoute et répète à voix haute."),h("button",{class:"btn",onclick:next},"Continuer")));
     say(it.zh); return;
   }
@@ -1027,7 +1248,8 @@ function renderStep(){
   const addOpts=(arr,render,two)=>{ if(two) optsBox.classList.add("two"); arr.forEach((o,i)=>optsBox.append(h("button",{class:"opt","aria-pressed":"false",onclick:()=>{pick(i); if(!L.answered&&(s.t==="fz"||s.t==="ctx")) say(o.zh);}},render(o,i)))); };
   if(s.t==="zf"){
     body.push(h("div",{class:"q-title"},"Que veut dire cette phrase ?"));
-    body.push(h("div",{class:"prompt"},h("div",null,zhEl("div",it.zh,"zh"),h("div",{class:"py"},it.py)),h("div",{class:"audio-row"},audioBtns(it.zh))));
+    const tw=tapWords(it,knownWords(L.node&&L.node.id),"zh");
+    body.push(h("div",{class:"prompt"},h("div",{style:"min-width:0"},tw.line,h("div",{class:"py"},it.py)),h("div",{class:"audio-row"},audioBtns(it.zh))),tw.info);
     addOpts(s.opts,(o,i)=>optCard(o,"fr",i)); body.push(optsBox); say(it.zh);
   } else if(s.t==="fz"){
     body.push(h("div",{class:"q-title"},"Comment dit-on ?"));
@@ -1204,7 +1426,7 @@ function renderCard(){
   const it=ITEM_BY_KEY[FC.deck[FC.i]]; FC.flipped=false;
   const face=(side)=>side==="fr"
     ?h("div",{class:"fc-face"},h("div",{class:"kicker"},"Français"),h("div",{class:"fc-fr"},it.fr))
-    :h("div",{class:"fc-face"},h("div",{class:"kicker"},"Chinois"),zhEl("div",it.zh,"fc-zh"),h("div",{class:"fc-py"},it.py),h("div",{class:"audio-row",onpointerdown:e=>e.stopPropagation()},audioBtns(it.zh)));
+    :(()=>{const tw=tapWords(it,null,"fc-zh"); return h("div",{class:"fc-face"},h("div",{class:"kicker"},"Chinois"),tw.line,h("div",{class:"fc-py"},it.py),tw.info,h("div",{class:"audio-row",onpointerdown:e=>e.stopPropagation()},audioBtns(it.zh)));})();
   const back=FC.front==="fr"?"zh":"fr";
   const inner=h("div",{class:"fc-inner"},h("div",{class:"fc-side front"},face(FC.front)),h("div",{class:"fc-side back"},face(back)));
   const card=h("div",{class:"fc-card",role:"button",tabindex:"0","aria-label":"Carte : touche pour retourner"},
